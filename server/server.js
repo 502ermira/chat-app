@@ -3,6 +3,7 @@ const dotenv = require('dotenv');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const authRoutes = require('./routes/authRoutes');
+const friendRoutes = require('./routes/friendRoutes');
 
 dotenv.config();
 
@@ -12,6 +13,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use('/api/auth', authRoutes);
+app.use('/api/friends', friendRoutes);
 
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
