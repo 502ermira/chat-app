@@ -7,6 +7,7 @@ const SendFriendRequest = () => {
   const [users, setUsers] = useState([]);
   const [message, setMessage] = useState('');
   const [pendingRequests, setPendingRequests] = useState([]);
+  const [userFriends, setUserFriends] = useState([]);
 
   useEffect(() => {
     const fetchPendingRequests = async () => {
@@ -21,7 +22,20 @@ const SendFriendRequest = () => {
       }
     };
 
+    const fetchUserFriends = async () => {
+      const token = localStorage.getItem('token');
+      try {
+        const { data } = await API.get('/friends', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setUserFriends(data);
+      } catch (error) {
+        console.error('Error fetching user friends:', error);
+      }
+    };
+
     fetchPendingRequests();
+    fetchUserFriends();
   }, []);
 
   const fetchUsers = debounce(async (searchUsername) => {
@@ -73,19 +87,27 @@ const SendFriendRequest = () => {
   };
 
   const renderUserAction = (user) => {
-    const pendingRequest = pendingRequests.find(request => request.requester.username === user.username);
+    const isFriend = userFriends.some(friend => friend._id === user._id);
 
-    if (pendingRequest) {
+    if (isFriend) {
       return (
-        <>
-          <button onClick={() => handleRespond(pendingRequest._id, 'accepted')}>Accept</button>
-          <button onClick={() => handleRespond(pendingRequest._id, 'declined')}>Decline</button>
-        </>
+        <span>&nbsp;-Friends</span>
       );
     } else {
-      return (
-        <button onClick={() => handleAddFriend(user.username)}>Add</button>
-      );
+      const pendingRequest = pendingRequests.find(request => request.requester.username === user.username);
+
+      if (pendingRequest) {
+        return (
+          <span>
+            <button onClick={() => handleRespond(pendingRequest._id, 'accepted')}>Accept</button>
+            <button onClick={() => handleRespond(pendingRequest._id, 'declined')}>Decline</button>
+          </span>
+        );
+      } else {
+        return (
+          <button onClick={() => handleAddFriend(user.username)}>Add</button>
+        );
+      }
     }
   };
 
