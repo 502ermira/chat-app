@@ -64,7 +64,6 @@ exports.sendFriendRequest = async (req, res) => {
   }
 };
 
-
 exports.respondToFriendRequest = async (req, res) => {
   const { requestId, status } = req.body;
   const recipientId = req.user._id;
@@ -106,8 +105,8 @@ exports.searchUsers = async (req, res) => {
 
   try {
     const users = await User.find({
-      username: { $regex: username, $options: 'i' } 
-    }).select('username'); 
+      username: { $regex: username, $options: 'i' }
+    }).select('username');
 
     res.json(users);
   } catch (error) {
@@ -117,7 +116,7 @@ exports.searchUsers = async (req, res) => {
 
 exports.getFriends = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).populate('friends', 'username');
+    const user = await User.findById(req.user._id).populate('friends', 'username');
     res.json(user.friends);
   } catch (error) {
     res.status(500).json({ message: error.message });
