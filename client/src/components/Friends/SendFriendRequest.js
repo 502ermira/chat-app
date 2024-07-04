@@ -3,32 +3,55 @@ import API from '../../api';
 
 const SendFriendRequest = () => {
   const [username, setUsername] = useState('');
+  const [users, setUsers] = useState([]);
   const [message, setMessage] = useState('');
 
-  const handleSubmit = async (e) => {
+  const handleSearch = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem('token');
     try {
-      const { data } = await API.post('/friends/send', { recipientUsername: username }, {
+      const { data } = await API.get(`/friends/search?username=${username}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setMessage(`Friend request sent to ${username}`);
+      setUsers(data);
+    } catch (error) {
+      setMessage(error.response.data.message || 'Error searching users');
+    }
+  };
+
+  const handleAddFriend = async (recipientUsername) => {
+    const token = localStorage.getItem('token');
+    try {
+      const { data } = await API.post('/friends/send', { recipientUsername }, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setMessage(`Friend request sent to ${recipientUsername}`);
     } catch (error) {
       setMessage(error.response.data.message || 'Error sending friend request');
     }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <input
-        type="text"
-        placeholder="Username"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-      />
-      <button type="submit">Send Friend Request</button>
+    <div>
+      <form onSubmit={handleSearch}>
+        <input
+          type="text"
+          placeholder="Search Username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+        />
+        <button type="submit">Search</button>
+      </form>
+      <ul>
+        {users.map((user) => (
+          <li key={user._id}>
+            {user.username}
+            <button onClick={() => handleAddFriend(user.username)}>Add</button>
+          </li>
+        ))}
+      </ul>
       {message && <p>{message}</p>}
-    </form>
+    </div>
   );
 };
 

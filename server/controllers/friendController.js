@@ -31,6 +31,16 @@ exports.sendFriendRequest = async (req, res) => {
       return res.status(400).json({ message: 'Friend request already sent' });
     }
 
+    const incomingRequest = await FriendRequest.findOne({
+      requester: recipient._id,
+      recipient: requesterId,
+      status: 'pending'
+    });
+
+    if (incomingRequest) {
+      return res.status(400).json({ message: 'You already have a friend request from this user' });
+    }
+
     const declinedRequest = await FriendRequest.findOne({
       requester: requesterId,
       recipient: recipient._id,
@@ -76,12 +86,30 @@ exports.respondToFriendRequest = async (req, res) => {
     if (status === 'accepted') {
       const requesterId = friendRequest.requester;
 
-      // Update the friends array of both users
       await User.findByIdAndUpdate(requesterId, { $push: { friends: recipientId } });
       await User.findByIdAndUpdate(recipientId, { $push: { friends: requesterId } });
+
+      await FriendRequest.deleteMany({
+        requester: recipientId,
+        recipient: requesterId
+      });
     }
 
     res.status(200).json(friendRequest);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.searchUsers = async (req, res) => {
+  const { username } = req.query;
+
+  try {
+    const users = await User.find({
+      username: { $regex: username, $options: 'i' } 
+    }).select('username'); 
+
+    res.json(users);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
