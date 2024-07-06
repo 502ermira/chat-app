@@ -47,6 +47,8 @@ io.use((socket, next) => {
 io.on('connection', (socket) => {
   console.log('a user connected');
   
+  socket.join(socket.user._id.toString()); 
+
   socket.on('send_message', async (data) => {
     console.log('message: ', data);
     try {
@@ -56,10 +58,11 @@ io.on('connection', (socket) => {
         message: data.message,
       });
       await message.save();
+
       io.to(data.recipientId).emit('receive_message', {
         sender: socket.user.username,
         message: data.message,
-        timestamp: message.createdAt,
+        timestamp: new Date().toISOString(), 
       });
     } catch (error) {
       console.error('Error saving message:', error);
@@ -70,6 +73,7 @@ io.on('connection', (socket) => {
     console.log('user disconnected');
   });
 });
+
 
 app.use('/api/auth', authRoutes);
 app.use('/api/friends', friendRoutes);

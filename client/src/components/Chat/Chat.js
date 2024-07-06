@@ -14,7 +14,10 @@ const Chat = ({ friendId }) => {
         const { data } = await API.get(`/messages/${friendId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        setMessages(data);
+        setMessages(data.map(msg => ({
+          ...msg,
+          timestamp: new Date(msg.timestamp)
+        })));
       } catch (error) {
         console.error('Error fetching messages:', error);
       }
@@ -25,7 +28,10 @@ const Chat = ({ friendId }) => {
   useEffect(() => {
     if (socket) {
       socket.on('receive_message', (data) => {
-        setMessages((prevMessages) => [...prevMessages, data]);
+        setMessages((prevMessages) => [...prevMessages, {
+          ...data,
+          timestamp: new Date(data.timestamp)
+        }]);
       });
 
       return () => socket.off('receive_message');
@@ -39,7 +45,7 @@ const Chat = ({ friendId }) => {
       socket.emit('send_message', msgData);
       setMessages((prevMessages) => [
         ...prevMessages,
-        { sender: 'Me', ...msgData, timestamp: new Date().toISOString() },
+        { sender: 'Me', ...msgData, timestamp: new Date() },
       ]);
       setMessage('');
     }
@@ -50,7 +56,7 @@ const Chat = ({ friendId }) => {
       <ul>
         {messages.map((msg, index) => (
           <li key={index}>
-            <strong>{msg.sender}</strong>: {msg.message} <small>({new Date(msg.timestamp).toLocaleString()})</small>
+            <strong>{msg.sender.username || msg.sender}</strong>: {msg.message} <small>({msg.timestamp.toLocaleString()})</small>
           </li>
         ))}
       </ul>

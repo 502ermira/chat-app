@@ -1,4 +1,5 @@
 const Message = require('../models/Message');
+const User = require('../models/User');
 
 exports.getMessages = async (req, res) => {
   const { friendId } = req.params;
@@ -10,7 +11,7 @@ exports.getMessages = async (req, res) => {
         { sender: userId, recipient: friendId },
         { sender: friendId, recipient: userId }
       ]
-    }).sort({ createdAt: 1 });
+    }).sort({ createdAt: 1 }).populate('sender', 'username').populate('recipient', 'username');
 
     res.json(messages);
   } catch (error) {
