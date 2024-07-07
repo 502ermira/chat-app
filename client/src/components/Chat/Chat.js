@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useSocket } from '../../contexts/SocketContext';
 import API from '../../api';
+import ImageModal from '../ImageModal/ImageModal';
 import './Chat.css';
 
 const Chat = ({ friendId, userId }) => {
@@ -8,6 +9,8 @@ const Chat = ({ friendId, userId }) => {
   const [messages, setMessages] = useState([]);
   const [image, setImage] = useState(null);
   const [friendUsername, setFriendUsername] = useState('');
+  const [modalImage, setModalImage] = useState(null); 
+  const [showModal, setShowModal] = useState(false); 
   const socket = useSocket();
 
   // Fetch friend's username
@@ -124,6 +127,16 @@ const Chat = ({ friendId, userId }) => {
     }
   };
 
+  const openModal = (imageUrl) => {
+    setModalImage(imageUrl);
+    setShowModal(true);
+  };
+
+  const closeModal = () => {
+    setModalImage(null);
+    setShowModal(false);
+  };
+
   const renderMessages = () => {
     let lastDate = null;
     return messages.map((msg, index) => {
@@ -136,7 +149,14 @@ const Chat = ({ friendId, userId }) => {
           {showDate && <div className="date-separator">{currentDate}</div>}
           <li className={`message ${msg.sender === userId ? 'sent' : 'received'}`}>
             {msg.message} <span className="timestamp">{formatTime(msg.timestamp)}</span>
-            {msg.image && <img src={msg.imagePath || msg.image} alt="Sent" className="message-image" />}
+            {msg.image && (
+              <img
+                src={msg.imagePath || msg.image}
+                alt="Sent"
+                className="message-image"
+                onClick={() => openModal(msg.imagePath || msg.image)}
+              />
+            )}
           </li>
         </React.Fragment>
       );
@@ -162,6 +182,7 @@ const Chat = ({ friendId, userId }) => {
         </label>
         <button type="submit">Send</button>
       </form>
+      {showModal && <ImageModal imageUrl={modalImage} onClose={closeModal} />} 
     </div>
   );
 };

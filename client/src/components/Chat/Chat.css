@@ -1,3 +1,15 @@
+.chat-container {
+  height: 100vh; /* Set chat container to full screen height */
+  overflow-y: auto; /* Enable vertical scrolling */
+  scrollbar-width: none; /* Hide scrollbar for browsers supporting scrollbar-width */
+  -ms-overflow-style: none; /* Hide scrollbar for Internet Explorer and Edge */
+}
+
+.chat-container::-webkit-scrollbar {
+  display: none; /* Hide scrollbar for WebKit browsers (Chrome, Safari) */
+}
+
+
 .message-list {
   list-style: none;
   padding: 0;
