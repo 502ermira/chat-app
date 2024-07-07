@@ -5,6 +5,7 @@ import API from '../../api';
 const Chat = ({ friendId }) => {
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState([]);
+  const [image, setImage] = useState(null);
   const socket = useSocket();
 
   useEffect(() => {
@@ -40,15 +41,40 @@ const Chat = ({ friendId }) => {
 
   const handleSendMessage = (e) => {
     e.preventDefault();
-    if (message.trim() && socket) {
-      const msgData = { recipientId: friendId, message };
-      socket.emit('send_message', msgData);
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        { sender: 'Me', ...msgData, timestamp: new Date() },
-      ]);
-      setMessage('');
+    if ((message.trim() || image) && socket) {
+      const formData = new FormData();
+      formData.append('recipientId', friendId);
+      formData.append('message', message);
+
+      if (image) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const base64Image = reader.result.split(',')[1];
+          formData.append('image', base64Image);
+          formData.append('imageType', image.type);
+
+          socket.emit('send_message', Object.fromEntries(formData));
+          setMessages((prevMessages) => [
+            ...prevMessages,
+            { sender: 'Me', message, image: `data:${image.type};base64,${base64Image}`, timestamp: new Date() },
+          ]);
+          setMessage('');
+          setImage(null);
+        };
+        reader.readAsDataURL(image);
+      } else {
+        socket.emit('send_message', Object.fromEntries(formData));
+        setMessages((prevMessages) => [
+          ...prevMessages,
+          { sender: 'Me', message, timestamp: new Date() },
+        ]);
+        setMessage('');
+      }
     }
+  };
+
+  const handleImageChange = (e) => {
+    setImage(e.target.files[0]);
   };
 
   return (
@@ -57,6 +83,7 @@ const Chat = ({ friendId }) => {
         {messages.map((msg, index) => (
           <li key={index}>
             <strong>{msg.sender.username || msg.sender}</strong>: {msg.message} <small>({msg.timestamp.toLocaleString()})</small>
+            {msg.image && <img src={msg.imagePath || msg.image} alt="Sent" style={{ maxWidth: '200px', display: 'block' }} />}
           </li>
         ))}
       </ul>
@@ -67,6 +94,7 @@ const Chat = ({ friendId }) => {
           onChange={(e) => setMessage(e.target.value)}
           placeholder="Type a message..."
         />
+        <input type="file" accept="image/*" onChange={handleImageChange} />
         <button type="submit">Send</button>
       </form>
     </div>

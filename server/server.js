@@ -24,7 +24,7 @@ const io = new Server(server, {
 });
 
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '11mb' })); 
 
 io.use((socket, next) => {
   const token = socket.handshake.auth.token;
@@ -55,13 +55,16 @@ io.on('connection', (socket) => {
       const message = new Message({
         sender: socket.user._id,
         recipient: data.recipientId,
-        message: data.message,
+        message: data.message || null,
+        image: data.image ? Buffer.from(data.image, 'base64') : null,
+        imageType: data.imageType || null
       });
       await message.save();
 
       io.to(data.recipientId).emit('receive_message', {
         sender: socket.user.username,
-        message: data.message,
+        message: data.message || null,
+        image: data.image ? `data:${data.imageType};base64,${data.image}` : null,
         timestamp: new Date().toISOString(), 
       });
     } catch (error) {
@@ -73,7 +76,6 @@ io.on('connection', (socket) => {
     console.log('user disconnected');
   });
 });
-
 
 app.use('/api/auth', authRoutes);
 app.use('/api/friends', friendRoutes);
