@@ -1,13 +1,32 @@
 import React, { useState, useEffect } from 'react';
 import { useSocket } from '../../contexts/SocketContext';
 import API from '../../api';
+import './Chat.css';
 
-const Chat = ({ friendId }) => {
+const Chat = ({ friendId, userId }) => {
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState([]);
   const [image, setImage] = useState(null);
+  const [friendUsername, setFriendUsername] = useState('');
   const socket = useSocket();
 
+  // Fetch friend's username
+  useEffect(() => {
+    const fetchFriendUsername = async () => {
+      const token = localStorage.getItem('token');
+      try {
+        const { data } = await API.get(`/friends/user/${friendId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setFriendUsername(data.username);
+      } catch (error) {
+        console.error('Error fetching friend username:', error);
+      }
+    };
+    fetchFriendUsername();
+  }, [friendId]);
+
+  // Fetch messages
   useEffect(() => {
     const fetchMessages = async () => {
       const token = localStorage.getItem('token');
@@ -17,7 +36,7 @@ const Chat = ({ friendId }) => {
         });
         setMessages(data.map(msg => ({
           ...msg,
-          timestamp: new Date(msg.timestamp)
+          timestamp: new Date(msg.timestamp),
         })));
       } catch (error) {
         console.error('Error fetching messages:', error);
@@ -26,13 +45,14 @@ const Chat = ({ friendId }) => {
     fetchMessages();
   }, [friendId]);
 
+  // Handle receiving messages in real-time
   useEffect(() => {
     if (socket) {
       socket.on('receive_message', (data) => {
-        setMessages((prevMessages) => [...prevMessages, {
-          ...data,
-          timestamp: new Date(data.timestamp)
-        }]);
+        setMessages((prevMessages) => [
+          ...prevMessages,
+          { ...data, timestamp: new Date(data.timestamp) },
+        ]);
       });
 
       return () => socket.off('receive_message');
@@ -56,7 +76,12 @@ const Chat = ({ friendId }) => {
           socket.emit('send_message', Object.fromEntries(formData));
           setMessages((prevMessages) => [
             ...prevMessages,
-            { sender: 'Me', message, image: `data:${image.type};base64,${base64Image}`, timestamp: new Date() },
+            {
+              sender: userId,
+              message,
+              image: `data:${image.type};base64,${base64Image}`,
+              timestamp: new Date(),
+            },
           ]);
           setMessage('');
           setImage(null);
@@ -66,7 +91,7 @@ const Chat = ({ friendId }) => {
         socket.emit('send_message', Object.fromEntries(formData));
         setMessages((prevMessages) => [
           ...prevMessages,
-          { sender: 'Me', message, timestamp: new Date() },
+          { sender: userId, message, timestamp: new Date() },
         ]);
         setMessage('');
       }
@@ -77,24 +102,64 @@ const Chat = ({ friendId }) => {
     setImage(e.target.files[0]);
   };
 
-  return (
-    <div>
-      <ul>
-        {messages.map((msg, index) => (
-          <li key={index}>
-            <strong>{msg.sender.username || msg.sender}</strong>: {msg.message} <small>({msg.timestamp.toLocaleString()})</small>
-            {msg.image && <img src={msg.imagePath || msg.image} alt="Sent" style={{ maxWidth: '200px', display: 'block' }} />}
+  const formatTime = (date) => {
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    return `${hours}:${minutes}`;
+  };
+
+  const formatDate = (date) => {
+    const now = new Date();
+    const diff = now - date;
+    const oneDay = 24 * 60 * 60 * 1000;
+
+    if (diff < oneDay) {
+      return 'Today';
+    } else if (diff < 2 * oneDay) {
+      return 'Yesterday';
+    } else if (diff < 7 * oneDay) {
+      return date.toLocaleDateString('en-US', { weekday: 'long' });
+    } else {
+      return date.toLocaleDateString();
+    }
+  };
+
+  const renderMessages = () => {
+    let lastDate = null;
+    return messages.map((msg, index) => {
+      const currentDate = formatDate(msg.timestamp);
+      const showDate = currentDate !== lastDate;
+      lastDate = currentDate;
+
+      return (
+        <React.Fragment key={index}>
+          {showDate && <div className="date-separator">{currentDate}</div>}
+          <li className={`message ${msg.sender === userId ? 'sent' : 'received'}`}>
+            {msg.message} <span className="timestamp">{formatTime(msg.timestamp)}</span>
+            {msg.image && <img src={msg.imagePath || msg.image} alt="Sent" className="message-image" />}
           </li>
-        ))}
-      </ul>
-      <form onSubmit={handleSendMessage}>
+        </React.Fragment>
+      );
+    });
+  };
+
+  return (
+    <div className="chat-container">
+      <div className="chat-header">
+        <h2>{friendUsername}</h2>
+      </div>
+      <ul className="message-list">{renderMessages()}</ul>
+      <form className="message-form" onSubmit={handleSendMessage}>
         <input
           type="text"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           placeholder="Type a message..."
         />
-        <input type="file" accept="image/*" onChange={handleImageChange} />
+        <label className="image-upload-label">
+          <input type="file" accept="image/*" onChange={handleImageChange} />
+          Send Photo
+        </label>
         <button type="submit">Send</button>
       </form>
     </div>
