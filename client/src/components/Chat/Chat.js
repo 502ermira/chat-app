@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useSocket } from '../../contexts/SocketContext';
 import API from '../../api';
 import ImageModal from '../ImageModal/ImageModal';
@@ -11,7 +11,11 @@ const Chat = ({ friendId, userId }) => {
   const [friendUsername, setFriendUsername] = useState('');
   const [modalImage, setModalImage] = useState(null); 
   const [showModal, setShowModal] = useState(false); 
+  const [loading, setLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
   const socket = useSocket();
+  const messagesEndRef = useRef(null);
+  const observer = useRef();
 
   // Fetch friend's username
   useEffect(() => {
@@ -29,24 +33,35 @@ const Chat = ({ friendId, userId }) => {
     fetchFriendUsername();
   }, [friendId]);
 
-  // Fetch messages
+  // Fetch initial messages
   useEffect(() => {
     const fetchMessages = async () => {
       const token = localStorage.getItem('token');
+      setLoading(true);
       try {
-        const { data } = await API.get(`/messages/${friendId}`, {
+        const { data } = await API.get(`/messages/${friendId}?limit=20`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setMessages(data.map(msg => ({
           ...msg,
           timestamp: new Date(msg.timestamp),
         })));
+        setHasMore(data.length === 20);
       } catch (error) {
         console.error('Error fetching messages:', error);
+      } finally {
+        setLoading(false);
       }
     };
     fetchMessages();
   }, [friendId]);
+
+  // Scroll to the bottom of the chat initially
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'auto' });
+    }
+  }, [messages]);
 
   // Handle receiving messages in real-time
   useEffect(() => {
@@ -137,6 +152,41 @@ const Chat = ({ friendId, userId }) => {
     setShowModal(false);
   };
 
+  const fetchMoreMessages = async () => {
+    const token = localStorage.getItem('token');
+    if (loading || !hasMore) return;
+    setLoading(true);
+    try {
+      const lastMessageTimestamp = messages[0]?.timestamp || new Date();
+      const { data } = await API.get(`/messages/${friendId}?limit=20&before=${lastMessageTimestamp.toISOString()}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setMessages((prevMessages) => [
+        ...data.map(msg => ({
+          ...msg,
+          timestamp: new Date(msg.timestamp),
+        })),
+        ...prevMessages
+      ]);
+      setHasMore(data.length === 20);
+    } catch (error) {
+      console.error('Error fetching more messages:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const lastMessageElementRef = useCallback(node => {
+    if (loading) return;
+    if (observer.current) observer.current.disconnect();
+    observer.current = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && hasMore) {
+        fetchMoreMessages();
+      }
+    });
+    if (node) observer.current.observe(node);
+  }, [loading, hasMore]);
+
   const renderMessages = () => {
     let lastDate = null;
     return messages.map((msg, index) => {
@@ -147,7 +197,7 @@ const Chat = ({ friendId, userId }) => {
       return (
         <React.Fragment key={index}>
           {showDate && <div className="date-separator">{currentDate}</div>}
-          <li className={`message ${msg.sender === userId ? 'sent' : 'received'}`}>
+          <li className={`message ${msg.sender === userId ? 'sent' : 'received'}`} ref={index === 0 ? lastMessageElementRef : null}>
             {msg.message} <span className="timestamp">{formatTime(msg.timestamp)}</span>
             {msg.image && (
               <img
@@ -168,7 +218,10 @@ const Chat = ({ friendId, userId }) => {
       <div className="chat-header">
         <h2>{friendUsername}</h2>
       </div>
-      <ul className="message-list">{renderMessages()}</ul>
+      <ul className="message-list">
+        {renderMessages()}
+        <div ref={messagesEndRef} />
+      </ul>
       <form className="message-form" onSubmit={handleSendMessage}>
         <input
           type="text"

@@ -3,6 +3,10 @@
   overflow-y: auto; /* Enable vertical scrolling */
   scrollbar-width: none; /* Hide scrollbar for browsers supporting scrollbar-width */
   -ms-overflow-style: none; /* Hide scrollbar for Internet Explorer and Edge */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-end; /* Align messages to the bottom */
 }
 
 .chat-container::-webkit-scrollbar {
