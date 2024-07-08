@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import API from '../../api';
+import { useAuth } from '../../contexts/AuthContext';
 
 const LoginForm = () => {
   const [email, setEmail] = useState('');
@@ -8,6 +9,7 @@ const LoginForm = () => {
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -15,10 +17,10 @@ const LoginForm = () => {
     try {
       const { data } = await API.post('/auth/login', { email, password });
       localStorage.setItem('token', data.token);
+      login(data.token);
       navigate('/');
-      window.location.reload(); // Force reload the page
     } catch (error) {
-      setMessage(error.response.data.message || 'Error logging in');
+      setMessage(error.response?.data?.message || 'Error logging in');
     } finally {
       setLoading(false);
     }

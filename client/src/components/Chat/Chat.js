@@ -71,6 +71,9 @@ const Chat = ({ friendId, userId }) => {
           ...prevMessages,
           { ...data, timestamp: new Date(data.timestamp) },
         ]);
+        if (messagesEndRef.current) {
+          messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
       });
 
       return () => socket.off('receive_message');
@@ -91,26 +94,28 @@ const Chat = ({ friendId, userId }) => {
           formData.append('image', base64Image);
           formData.append('imageType', image.type);
 
+          const newMessage = {
+            sender: { _id: userId },
+            message,
+            image: `data:${image.type};base64,${base64Image}`,
+            timestamp: new Date(),
+          };
+
           socket.emit('send_message', Object.fromEntries(formData));
-          setMessages((prevMessages) => [
-            ...prevMessages,
-            {
-              sender: userId,
-              message,
-              image: `data:${image.type};base64,${base64Image}`,
-              timestamp: new Date(),
-            },
-          ]);
+          setMessages((prevMessages) => [...prevMessages, newMessage]);
           setMessage('');
           setImage(null);
         };
         reader.readAsDataURL(image);
       } else {
+        const newMessage = {
+          sender: { _id: userId },
+          message,
+          timestamp: new Date(),
+        };
+
         socket.emit('send_message', Object.fromEntries(formData));
-        setMessages((prevMessages) => [
-          ...prevMessages,
-          { sender: userId, message, timestamp: new Date() },
-        ]);
+        setMessages((prevMessages) => [...prevMessages, newMessage]);
         setMessage('');
       }
     }
@@ -190,15 +195,18 @@ const Chat = ({ friendId, userId }) => {
   const renderMessages = () => {
     let lastDate = null;
     return messages.map((msg, index) => {
-      const currentDate = formatDate(msg.timestamp);
+      const currentDate = formatDate(new Date(msg.timestamp));
       const showDate = currentDate !== lastDate;
       lastDate = currentDate;
-
+  
+      const isSentMessage = msg.sender && msg.sender._id === userId;
+      const ref = index === 0 ? lastMessageElementRef : null;
+  
       return (
-        <React.Fragment key={index}>
-          {showDate && <div className="date-separator">{currentDate}</div>}
-          <li className={`message ${msg.sender === userId ? 'sent' : 'received'}`} ref={index === 0 ? lastMessageElementRef : null}>
-            {msg.message} <span className="timestamp">{formatTime(msg.timestamp)}</span>
+        <React.Fragment key={msg._id || index}>
+          {showDate && <div className="date-separator" key={`date-${index}`}>{currentDate}</div>}
+          <li className={`message ${isSentMessage ? 'sent' : 'received'}`} ref={ref} key={`msg-${index}`}>
+            {msg.message} <span className="timestamp">{formatTime(new Date(msg.timestamp))}</span>
             {msg.image && (
               <img
                 src={msg.imagePath || msg.image}
