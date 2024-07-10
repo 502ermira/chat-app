@@ -5,6 +5,7 @@ const cors = require('cors');
 const authRoutes = require('./routes/authRoutes');
 const friendRoutes = require('./routes/friendRoutes');
 const messageRoutes = require('./routes/messageRoutes');
+const chatRoutes = require('./routes/chatRoutes');
 const Message = require('./models/Message');
 const { Server } = require('socket.io');
 const http = require('http');
@@ -80,6 +81,7 @@ io.on('connection', (socket) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/friends', friendRoutes);
 app.use('/api/messages', messageRoutes);
+app.use('/api/chats', chatRoutes);
 
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
