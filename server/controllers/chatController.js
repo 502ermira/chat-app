@@ -38,12 +38,34 @@ exports.getRecentChats = async (req, res) => {
         $unwind: "$friend"
       },
       {
+        $lookup: {
+          from: "users",
+          localField: "lastMessage.sender",
+          foreignField: "_id",
+          as: "senderInfo"
+        }
+      },
+      {
+        $unwind: "$senderInfo"
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "lastMessage.recipient",
+          foreignField: "_id",
+          as: "recipientInfo"
+        }
+      },
+      {
+        $unwind: "$recipientInfo"
+      },
+      {
         $project: {
           _id: 0,
           friend: { _id: 1, username: 1 },
           lastMessage: {
-            sender: { _id: 1, username: 1 },
-            recipient: { _id: 1, username: 1 },
+            sender: { _id: "$senderInfo._id", username: "$senderInfo.username" },
+            recipient: { _id: "$recipientInfo._id", username: "$recipientInfo.username" },
             message: 1,
             timestamp: 1
           }

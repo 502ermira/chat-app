@@ -2,20 +2,16 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useAuth } from '../../contexts/AuthContext';
 import { Link } from 'react-router-dom';
-import './RecentChats.css'; 
+import './RecentChats.css';
+import API from '../../api';
 
 const RecentChats = () => {
-  const { user } = useAuth();
+  const { user } = useAuth(); 
   const [recentChats, setRecentChats] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchRecentChats = async () => {
-      if (!user) {
-        console.error('User not authenticated');
-        return;
-      }
-
       const token = localStorage.getItem('token');
       if (!token) {
         console.error('No token found');
@@ -23,7 +19,7 @@ const RecentChats = () => {
       }
 
       try {
-        const response = await axios.get('http://localhost:5000/api/chats/recent', {
+        const response = await API.get('/chats/recent', {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -36,23 +32,22 @@ const RecentChats = () => {
       }
     };
 
-    fetchRecentChats();
+    if (user) {
+      fetchRecentChats();
+    } else {
+      console.log('User not found in context');
+    }
   }, [user]);
 
   const formatDate = (timestamp) => {
     const date = new Date(timestamp);
     const now = new Date();
-    const dayDiff = Math.floor((now - date) / (1000 * 60 * 60 * 24));
-    const timeString = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const isToday = date.toDateString() === now.toDateString();
+    return isToday ? date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : date.toLocaleDateString();
+  };
 
-    if (dayDiff < 1) {
-      return timeString;
-    } else if (dayDiff < 7) {
-      const dayOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][date.getDay()];
-      return dayOfWeek;
-    } else {
-      return date.toLocaleDateString('en-GB');
-    }
+  const isMeSender = (senderId) => {
+    return user && senderId === user.id;
   };
 
   return (
@@ -72,7 +67,10 @@ const RecentChats = () => {
                       <p className="recent-chat-username">{chat.friend && chat.friend.username ? chat.friend.username : 'Unknown user'}</p>
                       <p className="recent-chat-timestamp">{chat.lastMessage ? formatDate(chat.lastMessage.timestamp) : ''}</p>
                     </div>
-                    <p className="recent-chat-message">{chat.lastMessage ? chat.lastMessage.message : 'No messages yet'}</p>
+                    <p className="recent-chat-message">
+                      {chat.lastMessage && isMeSender(chat.lastMessage.sender._id) ? 'Me: ' : ''}
+                      {chat.lastMessage ? chat.lastMessage.message : 'No messages yet'}
+                    </p>
                   </div>
                 </Link>
               ))}
