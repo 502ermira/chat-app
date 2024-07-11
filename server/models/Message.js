@@ -6,7 +6,8 @@ const messageSchema = new mongoose.Schema({
   message: { type: String },
   image: { type: Buffer },
   imageType: { type: String },
-  timestamp: { type: Date, default: Date.now }
+  timestamp: { type: Date, default: Date.now },
+  seen: { type: Boolean, default: false } 
 });
 
 messageSchema.virtual('imagePath').get(function() {

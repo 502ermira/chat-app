@@ -25,8 +25,9 @@ const io = new Server(server, {
 });
 
 app.use(cors());
-app.use(express.json({ limit: '11mb' })); 
+app.use(express.json({ limit: '11mb' }));
 
+// Middleware to authenticate socket connections
 io.use((socket, next) => {
   const token = socket.handshake.auth.token;
   if (!token) {
@@ -45,13 +46,14 @@ io.use((socket, next) => {
   });
 });
 
+// Socket connection handling
 io.on('connection', (socket) => {
   console.log('a user connected');
   
-  socket.join(socket.user._id.toString()); 
+  socket.join(socket.user._id.toString());
 
+  // Handle sending messages
   socket.on('send_message', async (data) => {
-    console.log('message: ', data);
     try {
       const message = new Message({
         sender: socket.user._id,
@@ -63,13 +65,30 @@ io.on('connection', (socket) => {
       await message.save();
 
       io.to(data.recipientId).emit('receive_message', {
-        sender: socket.user.username,
+        _id: message._id,
+        sender: socket.user,
+        recipient: data.recipientId,
         message: data.message || null,
         image: data.image ? `data:${data.imageType};base64,${data.image}` : null,
-        timestamp: new Date().toISOString(), 
+        timestamp: message.timestamp,
+        seen: message.seen,
       });
     } catch (error) {
       console.error('Error saving message:', error);
+    }
+  });
+
+  // Handle marking messages as seen
+  socket.on('messages_seen', async ({ friendId }) => {
+    try {
+      await Message.updateMany(
+        { sender: friendId, recipient: socket.user._id, seen: false },
+        { seen: true }
+      );
+
+      io.to(friendId).emit('messages_seen', { friendId });
+    } catch (error) {
+      console.error('Error marking messages as seen:', error);
     }
   });
 

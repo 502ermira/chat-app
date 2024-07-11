@@ -18,3 +18,18 @@ exports.getMessages = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+exports.markMessagesAsSeen = async (req, res) => {
+  const { friendId } = req.params;
+  const userId = req.user._id;
+
+  try {
+    await Message.updateMany(
+      { sender: friendId, recipient: userId, seen: false },
+      { seen: true }
+    );
+    res.status(200).json({ message: 'Messages marked as seen' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

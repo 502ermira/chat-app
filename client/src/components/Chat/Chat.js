@@ -76,7 +76,18 @@ const Chat = ({ friendId, userId }) => {
         }
       });
 
-      return () => socket.off('receive_message');
+      socket.on('messages_seen', ({ friendId: senderId }) => {
+        setMessages((prevMessages) =>
+          prevMessages.map((msg) =>
+            msg.sender._id === senderId ? { ...msg, seen: true } : msg
+          )
+        );
+      });
+
+      return () => {
+        socket.off('receive_message');
+        socket.off('messages_seen');
+      };
     }
   }, [socket]);
 
@@ -99,6 +110,7 @@ const Chat = ({ friendId, userId }) => {
             message,
             image: `data:${image.type};base64,${base64Image}`,
             timestamp: new Date(),
+            seen: false,
           };
 
           socket.emit('send_message', Object.fromEntries(formData));
@@ -112,6 +124,7 @@ const Chat = ({ friendId, userId }) => {
           sender: { _id: userId },
           message,
           timestamp: new Date(),
+          seen: false,
         };
 
         socket.emit('send_message', Object.fromEntries(formData));
@@ -215,11 +228,19 @@ const Chat = ({ friendId, userId }) => {
                 onClick={() => openModal(msg.imagePath || msg.image)}
               />
             )}
+            {isSentMessage && msg.seen && <span className="seen-status">Seen</span>}
           </li>
         </React.Fragment>
       );
     });
   };
+
+  // Emit 'messages_seen' event when the chat is viewed
+  useEffect(() => {
+    if (socket && messages.length > 0) {
+      socket.emit('messages_seen', { friendId });
+    }
+  }, [socket, messages, friendId]);
 
   return (
     <div className="chat-container">
