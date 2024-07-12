@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import './RecentChats.css';
 import API from '../../api';
 import { useSocket } from '../../contexts/SocketContext';
@@ -10,6 +10,7 @@ const RecentChats = () => {
   const [recentChats, setRecentChats] = useState([]);
   const [loading, setLoading] = useState(true);
   const socket = useSocket();
+  const location = useLocation();
 
   useEffect(() => {
     const fetchRecentChats = async () => {
@@ -38,7 +39,7 @@ const RecentChats = () => {
     } else {
       console.log('User not found in context');
     }
-  }, [user]);
+  }, [user, location]); 
 
   useEffect(() => {
     if (socket) {

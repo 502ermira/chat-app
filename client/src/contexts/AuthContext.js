@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import {jwtDecode} from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode';
 import API from '../api';
 
 const AuthContext = createContext();
@@ -8,28 +8,31 @@ export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [token, setToken] = useState(localStorage.getItem('token'));
   const [loading, setLoading] = useState(true);
 
   const login = (token) => {
     localStorage.setItem('token', token);
     const decodedToken = jwtDecode(token);
     setUser({ id: decodedToken.id, email: decodedToken.email });
+    setToken(token);
   };
 
   const logout = () => {
     localStorage.removeItem('token');
     setUser(null);
+    setToken(null);
   };
 
   useEffect(() => {
     const verifyToken = async () => {
-      const token = localStorage.getItem('token');
-      if (token) {
+      const storedToken = localStorage.getItem('token');
+      if (storedToken) {
         try {
           await API.get('/auth/verify-token', {
-            headers: { Authorization: `Bearer ${token}` },
+            headers: { Authorization: `Bearer ${storedToken}` },
           });
-          login(token);
+          login(storedToken);
           console.log('AuthProvider - User authenticated'); 
         } catch (error) {
           console.error('AuthProvider - Token verification failed:', error); 
@@ -44,7 +47,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, token, login, logout }}>
       {!loading ? children : <div>Loading...</div>}
     </AuthContext.Provider>
   );

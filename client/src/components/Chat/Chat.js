@@ -40,12 +40,17 @@ const Chat = ({ friendId, userId }) => {
         const { data } = await API.get(`/messages/${friendId}?limit=20`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        setMessages(data.map(msg => ({
+        const fetchedMessages = data.map(msg => ({
           ...msg,
           timestamp: new Date(msg.timestamp),
           seenAt: msg.seenAt ? new Date(msg.seenAt) : null,
-        })));
+        }));
+        setMessages(fetchedMessages);
         setHasMore(data.length === 20);
+
+        if (socket && socket.connected) {
+          socket.emit('messages_seen', { friendId });
+        }
       } catch (error) {
         console.error('Error fetching messages:', error);
       } finally {
@@ -53,7 +58,7 @@ const Chat = ({ friendId, userId }) => {
       }
     };
     fetchMessages();
-  }, [friendId]);
+  }, [friendId, socket]);
 
   useEffect(() => {
     if (messagesEndRef.current) {
@@ -63,6 +68,10 @@ const Chat = ({ friendId, userId }) => {
 
   useEffect(() => {
     if (socket) {
+      socket.on('connect', () => {
+        console.log('Socket connected');
+      });
+  
       socket.on('receive_message', (data) => {
         setMessages((prevMessages) => [
           ...prevMessages,
@@ -71,8 +80,11 @@ const Chat = ({ friendId, userId }) => {
         if (messagesEndRef.current) {
           messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
         }
+        if (socket.connected) {
+          socket.emit('messages_seen', { friendId });
+        }
       });
-
+  
       socket.on('messages_seen', ({ friendId: senderId }) => {
         setMessages((prevMessages) =>
           prevMessages.map((msg) =>
@@ -80,28 +92,28 @@ const Chat = ({ friendId, userId }) => {
           )
         );
       });
-
+  
       return () => {
         socket.off('receive_message');
         socket.off('messages_seen');
       };
     }
-  }, [socket]);
+  }, [socket, friendId]);
 
   const handleSendMessage = (e) => {
     e.preventDefault();
-    if ((message.trim() || image) && socket) {
+    if ((message.trim() || image) && socket && socket.connected) {
       const formData = new FormData();
       formData.append('recipientId', friendId);
       formData.append('message', message);
-
+  
       if (image) {
         const reader = new FileReader();
         reader.onloadend = () => {
           const base64Image = reader.result.split(',')[1];
           formData.append('image', base64Image);
           formData.append('imageType', image.type);
-
+  
           const newMessage = {
             sender: { _id: userId },
             message,
@@ -110,7 +122,7 @@ const Chat = ({ friendId, userId }) => {
             seen: false,
             seenAt: null,
           };
-
+  
           socket.emit('send_message', Object.fromEntries(formData));
           setMessages((prevMessages) => [...prevMessages, newMessage]);
           setMessage('');
@@ -125,13 +137,19 @@ const Chat = ({ friendId, userId }) => {
           seen: false,
           seenAt: null,
         };
-
+  
         socket.emit('send_message', Object.fromEntries(formData));
         setMessages((prevMessages) => [...prevMessages, newMessage]);
         setMessage('');
       }
     }
   };
+
+  useEffect(() => {
+    if (socket && messages.length > 0 && socket.connected) {
+      socket.emit('messages_seen', { friendId });
+    }
+  }, [socket, messages, friendId]);
 
   const handleImageChange = (e) => {
     setImage(e.target.files[0]);
