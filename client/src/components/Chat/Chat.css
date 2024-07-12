@@ -112,4 +112,13 @@
   margin-left: 10px;
 }
 
+.last-seen-status {
+  text-align: left;
+  color: gray;
+  font-size: 12px;
+  margin-right: 0;
+  margin-left: auto;
+}
+
+
 

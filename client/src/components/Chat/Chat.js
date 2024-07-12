@@ -207,13 +207,22 @@ const Chat = ({ friendId, userId }) => {
 
   const renderMessages = () => {
     let lastDate = null;
-    return messages.map((msg, index) => {
+    let lastMessageSeen = null;
+    let lastMessageSentByUser = null;
+
+    const messageElements = messages.map((msg, index) => {
       const currentDate = formatDate(new Date(msg.timestamp));
       const showDate = currentDate !== lastDate;
       lastDate = currentDate;
 
       const isSentMessage = msg.sender && msg.sender._id === userId;
       const ref = index === 0 ? lastMessageElementRef : null;
+
+      if (isSentMessage) {
+        lastMessageSentByUser = msg;
+      } else {
+        lastMessageSentByUser = null;
+      }
 
       return (
         <React.Fragment key={msg._id || index}>
@@ -237,6 +246,54 @@ const Chat = ({ friendId, userId }) => {
         </React.Fragment>
       );
     });
+
+    const formatTimeSince = (timestamp) => {
+      const now = new Date();
+      const diff = now - timestamp;
+      
+      const seconds = Math.floor(diff / 1000);
+      const minutes = Math.floor(diff / (1000 * 60));
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const weeks = Math.floor(diff / (1000 * 60 * 60 * 24 * 7));
+      const months = Math.floor(diff / (1000 * 60 * 60 * 24 * 30));
+      const years = Math.floor(diff / (1000 * 60 * 60 * 24 * 365));
+    
+      if (years > 0) {
+        return years === 1 ? 'a year ago' : `${years} years ago`;
+      }
+      if (months > 0) {
+        return months === 1 ? 'a month ago' : `${months} months ago`;
+      }
+      if (weeks > 0) {
+        return weeks === 1 ? 'a week ago' : `${weeks} weeks ago`;
+      }
+      if (days > 0) {
+        return days === 1 ? 'a day ago' : `${days} days ago`;
+      }
+      if (hours > 0) {
+        return hours === 1 ? 'an hour ago' : `${hours} hours ago`;
+      }
+      if (minutes > 0) {
+        return minutes === 1 ? 'a minute ago' : `${minutes} minutes ago`;
+      }
+      return seconds === 1 ? 'a second ago' : `${seconds} seconds ago`;
+    };    
+
+    if (lastMessageSentByUser && lastMessageSentByUser.seen) {
+      lastMessageSeen = (
+        <div className="last-seen-status">
+          Seen {formatTimeSince(new Date(lastMessageSentByUser.seenAt))}
+        </div>
+      );
+    }
+
+    return (
+      <>
+        {messageElements}
+        {lastMessageSeen}
+      </>
+    );
   };
 
   useEffect(() => {
