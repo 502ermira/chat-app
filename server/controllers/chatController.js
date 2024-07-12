@@ -23,7 +23,16 @@ exports.getRecentChats = async (req, res) => {
               else: "$sender"
             }
           },
-          lastMessage: { $first: "$$ROOT" }
+          lastMessage: { $first: "$$ROOT" },
+          unopenedCount: {
+            $sum: {
+              $cond: {
+                if: { $and: [{ $eq: ["$recipient", userId] }, { $eq: ["$seen", false] }] },
+                then: 1,
+                else: 0
+              }
+            }
+          }
         }
       },
       {
@@ -67,8 +76,10 @@ exports.getRecentChats = async (req, res) => {
             sender: { _id: "$senderInfo._id", username: "$senderInfo.username" },
             recipient: { _id: "$recipientInfo._id", username: "$recipientInfo.username" },
             message: 1,
-            timestamp: 1
-          }
+            timestamp: 1,
+            seen: 1
+          },
+          unopenedCount: 1
         }
       },
       { $sort: { "lastMessage.timestamp": -1 } }
@@ -79,3 +90,4 @@ exports.getRecentChats = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+

@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { useAuth } from '../../contexts/AuthContext';
 import { Link } from 'react-router-dom';
 import './RecentChats.css';
 import API from '../../api';
+import { useSocket } from '../../contexts/SocketContext';
+import { useAuth } from '../../contexts/AuthContext';
 
 const RecentChats = () => {
-  const { user } = useAuth(); 
+  const { user } = useAuth();
   const [recentChats, setRecentChats] = useState([]);
   const [loading, setLoading] = useState(true);
+  const socket = useSocket();
 
   useEffect(() => {
     const fetchRecentChats = async () => {
@@ -25,9 +26,9 @@ const RecentChats = () => {
           },
         });
         setRecentChats(response.data);
+        setLoading(false);
       } catch (error) {
         console.error('Error fetching recent chats:', error);
-      } finally {
         setLoading(false);
       }
     };
@@ -38,6 +39,56 @@ const RecentChats = () => {
       console.log('User not found in context');
     }
   }, [user]);
+
+  useEffect(() => {
+    if (socket) {
+      socket.on('receive_message', (newMessage) => {
+        setRecentChats((prevChats) => {
+          const updatedChats = prevChats.map((chat) => {
+            if (chat.friend._id === newMessage.sender._id) {
+              return {
+                ...chat,
+                lastMessage: newMessage,
+                unopenedCount: chat.unopenedCount + (newMessage.seen ? 0 : 1),
+              };
+            }
+            return chat;
+          });
+
+          const isExistingChat = updatedChats.some(chat => chat.friend._id === newMessage.sender._id);
+          if (!isExistingChat) {
+            updatedChats.push({
+              friend: newMessage.sender,
+              lastMessage: newMessage,
+              unopenedCount: newMessage.seen ? 0 : 1,
+            });
+          }
+
+          return updatedChats;
+        });
+      });
+
+      socket.on('messages_seen', ({ friendId }) => {
+        setRecentChats((prevChats) => {
+          const updatedChats = prevChats.map((chat) => {
+            if (chat.friend._id === friendId) {
+              return {
+                ...chat,
+                unopenedCount: 0,
+              };
+            }
+            return chat;
+          });
+          return updatedChats;
+        });
+      });
+
+      return () => {
+        socket.off('receive_message');
+        socket.off('messages_seen');
+      };
+    }
+  }, [socket]);
 
   const formatDate = (timestamp) => {
     const date = new Date(timestamp);
@@ -62,7 +113,7 @@ const RecentChats = () => {
             <div className="recent-chat-list">
               {recentChats.map((chat, index) => (
                 <Link key={index} to={`/chat/${chat.friend._id}`} className="recent-chat-link">
-                  <div className="recent-chat-item">
+                  <div className={`recent-chat-item ${chat.unopenedCount > 0 ? 'recent-chat-unseen' : ''}`}>
                     <div className="recent-chat-header">
                       <p className="recent-chat-username">{chat.friend && chat.friend.username ? chat.friend.username : 'Unknown user'}</p>
                       <p className="recent-chat-timestamp">{chat.lastMessage ? formatDate(chat.lastMessage.timestamp) : ''}</p>
@@ -71,6 +122,7 @@ const RecentChats = () => {
                       {chat.lastMessage && isMeSender(chat.lastMessage.sender._id) ? 'Me: ' : ''}
                       {chat.lastMessage ? chat.lastMessage.message : 'No messages yet'}
                     </p>
+                    {chat.unopenedCount > 0 && <span className="unopened-count">{chat.unopenedCount}</span>}
                   </div>
                 </Link>
               ))}
