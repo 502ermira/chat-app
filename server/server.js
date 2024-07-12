@@ -72,6 +72,7 @@ io.on('connection', (socket) => {
         image: data.image ? `data:${data.imageType};base64,${data.image}` : null,
         timestamp: message.timestamp,
         seen: message.seen,
+        seenAt: message.seenAt, 
       });
     } catch (error) {
       console.error('Error saving message:', error);
@@ -81,10 +82,25 @@ io.on('connection', (socket) => {
   // Handle marking messages as seen
   socket.on('messages_seen', async ({ friendId }) => {
     try {
-      await Message.updateMany(
-        { sender: friendId, recipient: socket.user._id, seen: false },
-        { seen: true }
-      );
+      const messages = await Message.find({
+        sender: friendId,
+        recipient: socket.user._id,
+        seen: false
+      });
+
+      const bulkOperations = messages.map(message => ({
+        updateOne: {
+          filter: { _id: message._id },
+          update: {
+            seen: true,
+            seenAt: message.seenAt || new Date() 
+          }
+        }
+      }));
+
+      if (bulkOperations.length > 0) {
+        await Message.bulkWrite(bulkOperations);
+      }
 
       io.to(friendId).emit('messages_seen', { friendId });
     } catch (error) {

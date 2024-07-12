@@ -9,15 +9,14 @@ const Chat = ({ friendId, userId }) => {
   const [messages, setMessages] = useState([]);
   const [image, setImage] = useState(null);
   const [friendUsername, setFriendUsername] = useState('');
-  const [modalImage, setModalImage] = useState(null); 
-  const [showModal, setShowModal] = useState(false); 
+  const [modalImage, setModalImage] = useState(null);
+  const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const socket = useSocket();
   const messagesEndRef = useRef(null);
   const observer = useRef();
 
-  // Fetch friend's username
   useEffect(() => {
     const fetchFriendUsername = async () => {
       const token = localStorage.getItem('token');
@@ -33,7 +32,6 @@ const Chat = ({ friendId, userId }) => {
     fetchFriendUsername();
   }, [friendId]);
 
-  // Fetch initial messages
   useEffect(() => {
     const fetchMessages = async () => {
       const token = localStorage.getItem('token');
@@ -45,6 +43,7 @@ const Chat = ({ friendId, userId }) => {
         setMessages(data.map(msg => ({
           ...msg,
           timestamp: new Date(msg.timestamp),
+          seenAt: msg.seenAt ? new Date(msg.seenAt) : null,
         })));
         setHasMore(data.length === 20);
       } catch (error) {
@@ -56,20 +55,18 @@ const Chat = ({ friendId, userId }) => {
     fetchMessages();
   }, [friendId]);
 
-  // Scroll to the bottom of the chat initially
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: 'auto' });
     }
   }, [messages]);
 
-  // Handle receiving messages in real-time
   useEffect(() => {
     if (socket) {
       socket.on('receive_message', (data) => {
         setMessages((prevMessages) => [
           ...prevMessages,
-          { ...data, timestamp: new Date(data.timestamp) },
+          { ...data, timestamp: new Date(data.timestamp), seenAt: data.seenAt ? new Date(data.seenAt) : null },
         ]);
         if (messagesEndRef.current) {
           messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
@@ -79,7 +76,7 @@ const Chat = ({ friendId, userId }) => {
       socket.on('messages_seen', ({ friendId: senderId }) => {
         setMessages((prevMessages) =>
           prevMessages.map((msg) =>
-            msg.sender._id === senderId ? { ...msg, seen: true } : msg
+            msg.sender._id === senderId ? { ...msg, seen: true, seenAt: msg.seenAt || new Date() } : msg
           )
         );
       });
@@ -111,6 +108,7 @@ const Chat = ({ friendId, userId }) => {
             image: `data:${image.type};base64,${base64Image}`,
             timestamp: new Date(),
             seen: false,
+            seenAt: null,
           };
 
           socket.emit('send_message', Object.fromEntries(formData));
@@ -125,6 +123,7 @@ const Chat = ({ friendId, userId }) => {
           message,
           timestamp: new Date(),
           seen: false,
+          seenAt: null,
         };
 
         socket.emit('send_message', Object.fromEntries(formData));
@@ -183,6 +182,7 @@ const Chat = ({ friendId, userId }) => {
         ...data.map(msg => ({
           ...msg,
           timestamp: new Date(msg.timestamp),
+          seenAt: msg.seenAt ? new Date(msg.seenAt) : null,
         })),
         ...prevMessages
       ]);
@@ -211,10 +211,10 @@ const Chat = ({ friendId, userId }) => {
       const currentDate = formatDate(new Date(msg.timestamp));
       const showDate = currentDate !== lastDate;
       lastDate = currentDate;
-  
+
       const isSentMessage = msg.sender && msg.sender._id === userId;
       const ref = index === 0 ? lastMessageElementRef : null;
-  
+
       return (
         <React.Fragment key={msg._id || index}>
           {showDate && <div className="date-separator" key={`date-${index}`}>{currentDate}</div>}
@@ -228,14 +228,17 @@ const Chat = ({ friendId, userId }) => {
                 onClick={() => openModal(msg.imagePath || msg.image)}
               />
             )}
-            {isSentMessage && msg.seen && <span className="seen-status">Seen</span>}
+            {isSentMessage && msg.seen && (
+              <span className="seen-status">
+                Seen at {formatTime(new Date(msg.seenAt))}
+              </span>
+            )}
           </li>
         </React.Fragment>
       );
     });
   };
 
-  // Emit 'messages_seen' event when the chat is viewed
   useEffect(() => {
     if (socket && messages.length > 0) {
       socket.emit('messages_seen', { friendId });
@@ -259,12 +262,12 @@ const Chat = ({ friendId, userId }) => {
           placeholder="Type a message..."
         />
         <label className="image-upload-label">
-          <input type="file" accept="image/*" onChange={handleImageChange} />
+          <input type="file" onChange={handleImageChange} />
           Send Photo
         </label>
         <button type="submit">Send</button>
       </form>
-      {showModal && <ImageModal imageUrl={modalImage} onClose={closeModal} />} 
+      {showModal && <ImageModal imageUrl={modalImage} onClose={closeModal} />}
     </div>
   );
 };

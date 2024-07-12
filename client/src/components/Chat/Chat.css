@@ -101,5 +101,15 @@
 .message-form button:hover {
   background-color: #45a049;
 }
+.message-form button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.seen-status {
+  font-size: 0.8em;
+  color: #4caf50;
+  margin-left: 10px;
+}
 
 
