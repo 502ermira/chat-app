@@ -1,12 +1,10 @@
-import LogoutButton from '../components/Auth/LogoutButton';
+import React from 'react';
 import UserProfile from '../components/UserProfile/UserProfile';
 
 const HomePage = () => {
-
   return (
-    <div>
-      <h1>Home</h1>
-      <LogoutButton />
+    <div className="user-profile">
+        <h1>User Profile</h1>
       <UserProfile />
     </div>
   );

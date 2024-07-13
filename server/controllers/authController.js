@@ -7,7 +7,7 @@ const generateToken = (id) => {
 };
 
 exports.registerUser = async (req, res) => {
-  const { username, email, password } = req.body;
+  const { username, email, password, fullName, birthday, gender, profilePicture } = req.body;
 
   try {
     const userExists = await User.findOne({ email });
@@ -20,6 +20,10 @@ exports.registerUser = async (req, res) => {
       username,
       email,
       password,
+      fullName,
+      birthday,
+      gender,
+      profilePicture,
     });
 
     if (user) {
@@ -105,11 +109,25 @@ exports.getUserData = async (req, res) => {
 
 exports.updateUserData = async (req, res) => {
   try {
-    const { username, email, password } = req.body;
+    const { username, email, password, fullName, birthday, gender, profilePicture } = req.body;
     const user = await User.findById(req.user);
 
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
+    }
+
+    if (username && username !== user.username) {
+      const usernameExists = await User.findOne({ username });
+      if (usernameExists) {
+        return res.status(400).json({ message: 'Username already taken' });
+      }
+    }
+
+    if (email && email !== user.email) {
+      const emailExists = await User.findOne({ email });
+      if (emailExists) {
+        return res.status(400).json({ message: 'Email already in use' });
+      }
     }
 
     if (username) user.username = username;
@@ -121,6 +139,10 @@ exports.updateUserData = async (req, res) => {
       }
       user.password = password;
     }
+    if (fullName) user.fullName = fullName;
+    if (birthday) user.birthday = birthday;
+    if (gender) user.gender = gender;
+    if (profilePicture) user.profilePicture = profilePicture;
 
     await user.save();
 

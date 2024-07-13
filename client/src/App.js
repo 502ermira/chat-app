@@ -1,4 +1,3 @@
-import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useMatch } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
@@ -10,6 +9,7 @@ import RecentChatsPage from './pages/RecentChatsPage';
 import BottomNav from './BottomNav/BottomNav';
 import { SocketProvider } from './contexts/SocketContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import './App.css';
 
 const AppRoutes = () => {
   const { user } = useAuth();
