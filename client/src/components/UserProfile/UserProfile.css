@@ -1,0 +1,57 @@
+.user-profile {
+    max-width: 400px;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    font-family: Arial, sans-serif;
+  }
+  
+  .user-profile label {
+    display: block;
+    margin-bottom: 10px;
+  }
+  
+  .user-profile input {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+  }
+  
+  .user-profile button {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    background-color: #28a745;
+    color: #fff;
+    margin-right: 10px;
+  }
+  
+  .user-profile button:hover {
+    background-color: #218838;
+  }
+  
+  .user-profile .message {
+    background-color: #d4edda;
+    color: #155724;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #c3e6cb;
+    border-radius: 4px;
+  }
+  
+  .user-profile .error {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #f5c6cb;
+    border-radius: 4px;
+  }
+  

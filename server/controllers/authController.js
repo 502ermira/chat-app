@@ -58,8 +58,23 @@ exports.authUser = async (req, res) => {
   }
 };
 
-exports.verifyToken = async (req, res) => {
-  const token = req.headers.authorization.split(' ')[1];
+exports.verifyToken = async (req, res, next) => {
+  const token = req.headers.authorization && req.headers.authorization.split(' ')[1];
+  if (!token) {
+    return res.status(401).json({ message: 'No token, authorization denied' });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded.id;
+    next();
+  } catch (error) {
+    res.status(401).json({ message: 'Token is not valid' });
+  }
+};
+
+exports.verifyTokenEndpoint = async (req, res) => {
+  const token = req.headers.authorization && req.headers.authorization.split(' ')[1];
   if (!token) {
     return res.status(401).json({ message: 'No token, authorization denied' });
   }
@@ -73,5 +88,45 @@ exports.verifyToken = async (req, res) => {
     res.json({ message: 'Token is valid' });
   } catch (error) {
     res.status(401).json({ message: 'Token is not valid' });
+  }
+};
+
+exports.getUserData = async (req, res) => {
+  try {
+    const user = await User.findById(req.user).select('-password');
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+exports.updateUserData = async (req, res) => {
+  try {
+    const { username, email, password } = req.body;
+    const user = await User.findById(req.user);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    if (username) user.username = username;
+    if (email) user.email = email;
+    if (password) {
+      const isSamePassword = await bcrypt.compare(password, user.password);
+      if (isSamePassword) {
+        return res.status(400).json({ message: 'New password cannot be the same as the old password' });
+      }
+      user.password = password;
+    }
+
+    await user.save();
+
+    res.json({ message: 'User data updated successfully' });
+  } catch (error) {
+    console.error('Error updating user data:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
