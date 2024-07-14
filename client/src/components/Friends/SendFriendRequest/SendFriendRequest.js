@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import API from '../../api';
+import API from '../../../api';
 import debounce from 'lodash.debounce';
+import './SendFriendRequest.css';
 
 const SendFriendRequest = () => {
   const [username, setUsername] = useState('');
@@ -28,7 +29,10 @@ const SendFriendRequest = () => {
         const { data } = await API.get('/friends', {
           headers: { Authorization: `Bearer ${token}` },
         });
-        setUserFriends(data);
+        // Remove duplicates
+        const uniqueFriends = Array.from(new Set(data.map(friend => friend._id)))
+          .map(id => data.find(friend => friend._id === id));
+        setUserFriends(uniqueFriends);
       } catch (error) {
         console.error('Error fetching user friends:', error);
       }
@@ -49,7 +53,9 @@ const SendFriendRequest = () => {
       const { data } = await API.get(`/friends/search?username=${searchUsername}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setUsers(data);
+      // Filter out the logged-in user
+      const filteredData = data.filter(user => user.username !== localStorage.getItem('username'));
+      setUsers(filteredData);
     } catch (error) {
       setMessage(error.response.data.message || 'Error searching users');
     }
@@ -90,9 +96,7 @@ const SendFriendRequest = () => {
     const isFriend = userFriends.some(friend => friend._id === user._id);
 
     if (isFriend) {
-      return (
-        <span>&nbsp;-Friends</span>
-      );
+      return <span>&nbsp;-Friends</span>;
     } else {
       const pendingRequest = pendingRequests.find(request => request.requester.username === user.username);
 
@@ -104,15 +108,13 @@ const SendFriendRequest = () => {
           </span>
         );
       } else {
-        return (
-          <button onClick={() => handleAddFriend(user.username)}>Add</button>
-        );
+        return <button onClick={() => handleAddFriend(user.username)}>Add</button>;
       }
     }
   };
 
   return (
-    <div>
+    <div className="send-friend-request-container">
       <input
         type="text"
         placeholder="Search Username"

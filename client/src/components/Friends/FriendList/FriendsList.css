@@ -1,0 +1,36 @@
+.friends-list {
+    padding: 20px;
+  }
+  
+  .friend-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    cursor: pointer;
+    border-bottom: 1px solid #ccc;
+  }
+  
+  .friend-item:hover {
+    background-color: #f0f0f0;
+  }
+  
+  .friend-profile-picture {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+  }
+  
+  .friend-details {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .friend-full-name {
+    font-weight: bold;
+  }
+  
+  .friend-username {
+    color: #555;
+  }
+  

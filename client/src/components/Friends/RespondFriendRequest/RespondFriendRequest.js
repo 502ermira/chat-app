@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import API from '../../api';
+import API from '../../../api';
+import './RespondFriendRequest.css';
 
 const RespondFriendRequest = () => {
   const [requests, setRequests] = useState([]);
@@ -34,18 +35,20 @@ const RespondFriendRequest = () => {
   };
 
   return (
-    <div>
+    <div className="respond-friend-request">
       <h1>Friend Requests</h1>
-      <ul>
+      <ul className="request-list">
         {requests.map((request) => (
-          <li key={request._id}>
-            {request.requester.username}
-            <button onClick={() => handleRespond(request._id, 'accepted')}>Accept</button>
-            <button onClick={() => handleRespond(request._id, 'declined')}>Decline</button>
+          <li key={request._id} className="request-item">
+            <span className="requester-username">{request.requester.username}</span>
+            <div className="buttons-container">
+              <button className="respond-button accept" onClick={() => handleRespond(request._id, 'accepted')}>Accept</button>
+              <button className="respond-button decline" onClick={() => handleRespond(request._id, 'declined')}>Decline</button>
+            </div>
           </li>
         ))}
       </ul>
-      {message && <p>{message}</p>}
+      {message && <p className="message">{message}</p>}
     </div>
   );
 };

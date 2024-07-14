@@ -102,13 +102,16 @@ exports.respondToFriendRequest = async (req, res) => {
 
 exports.searchUsers = async (req, res) => {
   const { username } = req.query;
+  const loggedInUser = req.user.username;
 
   try {
     const users = await User.find({
       username: { $regex: username, $options: 'i' }
     }).select('username');
 
-    res.json(users);
+    const filteredUsers = users.filter(user => user.username !== loggedInUser);
+
+    res.json(filteredUsers);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -116,10 +119,10 @@ exports.searchUsers = async (req, res) => {
 
 exports.getFriends = async (req, res) => {
   try {
-    const user = await User.findById(req.user._id).populate('friends', 'username');
+    const user = await User.findById(req.user).populate('friends', 'username fullName profilePicture');
     res.json(user.friends);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
 

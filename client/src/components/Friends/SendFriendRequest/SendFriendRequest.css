@@ -1,0 +1,40 @@
+.send-friend-request-container {
+    margin: 20px;
+  }
+  
+  .send-friend-request-container input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  .send-friend-request-container ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .send-friend-request-container li {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    border: 1px solid #ddd;
+    margin-bottom: 10px;
+    border-radius: 4px;
+  }
+  
+  .send-friend-request-container button {
+    padding: 5px 10px;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .send-friend-request-container button:hover {
+    background-color: #0056b3;
+  }
+  

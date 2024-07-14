@@ -1,0 +1,55 @@
+.respond-friend-request {
+    padding: 20px;
+  }
+  
+  .respond-friend-request h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+  
+  .request-list {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .request-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 23px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    background-color: #f9f9f9;
+  }
+  
+  .requester-username {
+    font-size: 18px;
+  }
+  
+  .buttons-container {
+    display: flex;
+    gap: 5px;
+  }
+  
+  .respond-button {
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .respond-button.accept {
+    background-color: #4caf50;
+    color: white;
+  }
+  
+  .respond-button.decline {
+    background-color: #f44336;
+    color: white;
+  }
+  
+  .message {
+    margin-top: 20px;
+    font-size: 16px;
+    color: #4caf50;
+  }
