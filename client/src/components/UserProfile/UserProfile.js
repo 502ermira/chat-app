@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import API from '../../api';
-import './UserProfile.css'; 
+import './UserProfile.css';
 import LogoutButton from '../Auth/LogoutButton';
 import { FaRegUser } from "react-icons/fa";
 import { AiOutlineMail } from "react-icons/ai";
@@ -53,6 +53,16 @@ const UserProfile = () => {
     fetchUserData();
   }, []);
 
+  useEffect(() => {
+    if (message) {
+      const timer = setTimeout(() => {
+        setMessage('');
+      }, 4500);
+
+      return () => clearTimeout(timer);
+    }
+  }, [message]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setUserData((prevData) => ({
@@ -102,7 +112,7 @@ const UserProfile = () => {
         }
       );
       setEditing(false);
-      setMessage(data.message);
+      setMessage(data.message || 'User Data updated successfully');
       setError('');
     } catch (error) {
       console.error('Error updating user data:', error);
@@ -136,7 +146,7 @@ const UserProfile = () => {
   };
 
   return (
-    <div>
+    <div className="user-profile">
       {message && <div className="message">{message}</div>}
       {error && <div className="error">{error}</div>}
       {editing ? (
@@ -237,11 +247,10 @@ const UserProfile = () => {
               alt="Profile"
               className="profile-picture"
             />
-            <h2 className="profile-name">{userData.username}</h2>
+            <h2 className="profile-name">{userData.fullName}</h2>
           </div>
           <div className="info">
-            <p className="info-item"><span className="info-label"><FaRegUser /></span> {userData.fullName}</p>
-            <p className="info-item"><span className="info-label"><AiOutlineMail /></span> {userData.email}</p>
+            <p className="info-item"><span className="info-label"><FaRegUser /></span> {userData.username}</p>
             <p className="info-item"><span className="info-label"><PiCalendarDotsDuotone /></span> {userData.birthday}</p>
             <p className="info-item">
               <span className="info-label">
@@ -249,6 +258,7 @@ const UserProfile = () => {
               </span>
               {userData.gender}
             </p>
+            <p className="info-item"><span className="info-label"><AiOutlineMail /></span> {userData.email}</p>
             <p className="info-item">
               <span className="info-label"><IoEyeOutline /></span>
               Password 

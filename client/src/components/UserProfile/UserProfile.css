@@ -1,0 +1,165 @@
+.user-profile {
+  width: 100%;
+  margin: 0 auto;
+  background: #09120c;
+  color: #ffffff;
+  padding: 24px 19px;
+  height:92vh;
+  position: relative; 
+}
+
+.message, .error {
+  position: absolute;
+  left: 50%; 
+  top:23px;
+  transform: translate(-50%, -50%); 
+  margin-bottom: 20px;
+  padding: 10px;
+  border-radius: 5px;
+  text-align: center;
+}
+
+.message {
+  background-color: #2e7d32;
+  margin-left:40%;
+}
+
+.error {
+  background-color: #c62828;
+}
+
+.edit-form label {
+  display: block;
+  margin-bottom: 15px;
+  color: #ffffff;
+}
+
+.edit-form{
+padding-top:8%;
+}
+
+.input-field {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  border: 1px solid #4a4a4a;
+  border-radius: 5px;
+  background: #2a4729;
+  color: #ffffff;
+}
+
+.button-group {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.save-button, .cancel-button, .edit-button, .update-button {
+  width: 48%;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  background: #006400;
+  color: #ffffff;
+  font-size: 16px;
+  transition: background 0.3s ease;
+}
+
+.save-button:hover, .cancel-button:hover, .edit-button:hover, .update-button:hover {
+  background: #004d00;
+}
+
+.save-button:disabled {
+  background: #4a4a4a;
+  cursor: not-allowed;
+}
+
+.cancel-button {
+  background: #c62828;
+}
+
+.profile-view {
+  text-align: center;
+}
+
+.profile-header {
+  padding: 20px;
+  color: #ffffff;
+}
+
+.profile-picture {
+  width: 127px;
+  height: 127px;
+  border-radius: 50%;
+  object-fit: cover;
+  background-color: #2a4729;
+  margin-bottom: 12px;
+}
+
+.profile-name {
+  margin: 0;
+  font-size: 24px;
+}
+
+.info {
+  padding: 10px 10px 20px 10px;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  margin: 38px 0px;
+  position: relative;
+}
+
+.info-item:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  bottom: -19px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(#4b8c4a, transparent);
+}
+
+.info-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 40px;
+  margin-right: 23px;
+  color: #4b8c4a;
+  font-size: 25px;
+}
+
+.info-item button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  color: #fff;
+  font-size: 17px;
+}
+
+.info-item{
+  font-size:17px;
+}
+
+.info-item .update-button {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-right: 0;
+  margin-left: 45%;
+}
+.logout-button {
+  font-size:20px;
+}
+.edit-button {
+  background: #006400;
+}
+
+.edit-button:hover {
+  background: #004d00;
+}
