@@ -114,6 +114,7 @@ const UserProfile = () => {
       setEditing(false);
       setMessage(data.message || 'User Data updated successfully');
       setError('');
+      setInitialData({ ...userData, password: '', confirmPassword: '' }); 
     } catch (error) {
       console.error('Error updating user data:', error);
       if (error.response && error.response.data && error.response.data.message) {
@@ -123,7 +124,7 @@ const UserProfile = () => {
       }
       setMessage('');
     }
-  };
+  };  
   
   const handleCancel = () => {
     setUserData(initialData);
@@ -133,9 +134,15 @@ const UserProfile = () => {
   };
 
   const hasChanges = () => {
-    return JSON.stringify(userData) !== JSON.stringify(initialData);
+    const fieldsToCompare = ['username', 'email', 'fullName', 'birthday', 'gender', 'profilePicture'];
+    for (const field of fieldsToCompare) {
+      if (userData[field] !== initialData[field]) {
+        return true;
+      }
+    }
+    return userData.password !== '' || userData.confirmPassword !== '';
   };
-
+  
   const handlePasswordUpdate = () => {
     setEditing(true);
     setMessage('');
@@ -235,8 +242,8 @@ const UserProfile = () => {
             />
           </label>
           <div className="button-group">
-            <button onClick={handleSave} className="save-button" disabled={!hasChanges()}>Save</button>
-            <button onClick={handleCancel} className="cancel-button">Cancel</button>
+           <button onClick={handleSave} className="save-button" disabled={!hasChanges()}>Save</button>
+           <button onClick={handleCancel} className="cancel-button">Cancel</button>
           </div>
         </div>
       ) : (
