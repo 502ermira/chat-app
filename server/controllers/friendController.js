@@ -69,10 +69,16 @@ exports.respondToFriendRequest = async (req, res) => {
   const recipientId = req.user._id;
 
   try {
-    const friendRequest = await FriendRequest.findOne({ _id: requestId, recipient: recipientId });
+    const friendRequest = await FriendRequest.findById(requestId)
+      .populate('requester', 'username fullName')
+      .populate('recipient', 'username fullName');
 
     if (!friendRequest) {
       return res.status(404).json({ message: 'Friend request not found' });
+    }
+
+    if (!friendRequest.recipient._id.equals(recipientId)) {
+      return res.status(403).json({ message: 'You are not authorized to respond to this request' });
     }
 
     if (!['accepted', 'declined'].includes(status)) {
@@ -80,18 +86,14 @@ exports.respondToFriendRequest = async (req, res) => {
     }
 
     friendRequest.status = status;
+    friendRequest.respondedAt = new Date();
     await friendRequest.save();
 
     if (status === 'accepted') {
-      const requesterId = friendRequest.requester;
+      const requesterId = friendRequest.requester._id;
 
       await User.findByIdAndUpdate(requesterId, { $push: { friends: recipientId } });
       await User.findByIdAndUpdate(recipientId, { $push: { friends: requesterId } });
-
-      await FriendRequest.deleteMany({
-        requester: recipientId,
-        recipient: requesterId
-      });
     }
 
     res.status(200).json(friendRequest);
@@ -102,16 +104,19 @@ exports.respondToFriendRequest = async (req, res) => {
 
 exports.searchUsers = async (req, res) => {
   const { username } = req.query;
-  const loggedInUser = req.user.username;
+  const loggedInUserId = req.user._id;
 
   try {
     const users = await User.find({
-      username: { $regex: username, $options: 'i' }
-    }).select('username');
+      username: { $regex: `^${username}`, $options: 'i' }
+    }).select('username fullName profilePicture');
 
-    const filteredUsers = users.filter(user => user.username !== loggedInUser);
+    const loggedInUser = await User.findById(loggedInUserId).populate('friends');
+    const friends = loggedInUser.friends.map(friend => friend._id.toString());
+    const friendsList = users.filter(user => friends.includes(user._id.toString()));
+    const nonFriendsList = users.filter(user => !friends.includes(user._id.toString()) && user._id.toString() !== loggedInUserId.toString());
 
-    res.json(filteredUsers);
+    res.json([...friendsList, ...nonFriendsList]);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -128,8 +133,15 @@ exports.getFriends = async (req, res) => {
 
 exports.getFriendRequests = async (req, res) => {
   try {
-    const requests = await FriendRequest.find({ recipient: req.user._id, status: 'pending' })
-      .populate('requester', 'username');
+    const requests = await FriendRequest.find({
+      $or: [
+        { requester: req.user._id },
+        { recipient: req.user._id }
+      ]
+    })
+      .populate('requester', 'username fullName profilePicture')
+      .populate('recipient', 'username fullName profilePicture');
+    
     res.json(requests);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -146,6 +158,6 @@ exports.getUserById = async (req, res) => {
     }
     res.json(user);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status (500).json({ message: error.message });
   }
 };

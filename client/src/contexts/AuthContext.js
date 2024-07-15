@@ -14,7 +14,7 @@ export const AuthProvider = ({ children }) => {
   const login = (token) => {
     localStorage.setItem('token', token);
     const decodedToken = jwtDecode(token);
-    setUser({ id: decodedToken.id, email: decodedToken.email });
+    setUser({ _id: decodedToken.id, username: decodedToken.username, email: decodedToken.email }); // ensure it includes _id and username
     setToken(token);
   };
 
@@ -33,9 +33,9 @@ export const AuthProvider = ({ children }) => {
             headers: { Authorization: `Bearer ${storedToken}` },
           });
           login(storedToken);
-          console.log('AuthProvider - User authenticated'); 
+          console.log('AuthProvider - User authenticated');
         } catch (error) {
-          console.error('AuthProvider - Token verification failed:', error); 
+          console.error('AuthProvider - Token verification failed:', error);
           localStorage.removeItem('token');
           setUser(null);
         }

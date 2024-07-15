@@ -1,40 +1,57 @@
 .send-friend-request-container {
-    margin: 20px;
-  }
-  
-  .send-friend-request-container input[type="text"] {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 20px;
-    box-sizing: border-box;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-  }
-  
-  .send-friend-request-container ul {
-    list-style-type: none;
-    padding: 0;
-  }
-  
-  .send-friend-request-container li {
-    display: flex;
-    justify-content: space-between;
-    padding: 10px;
-    border: 1px solid #ddd;
-    margin-bottom: 10px;
-    border-radius: 4px;
-  }
-  
-  .send-friend-request-container button {
-    padding: 5px 10px;
-    border: none;
-    background-color: #007bff;
-    color: white;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  
-  .send-friend-request-container button:hover {
-    background-color: #0056b3;
-  }
-  
+  margin: 20px;
+}
+
+.send-friend-request-container input[type="text"] {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 20px;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.send-friend-request-container ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.send-friend-request-container li {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border: 1px solid #ddd;
+  margin-bottom: 10px;
+  border-radius: 4px;
+  cursor: pointer; /* Make the whole item clickable */
+  transition: background-color 0.3s ease;
+}
+
+.send-friend-request-container li:hover {
+  background-color: #f0f0f0; /* Highlight on hover */
+}
+
+.friend-profile-picture {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.friend-details {
+  flex-grow: 1;
+}
+
+.friend-full-name {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.friend-username {
+  font-size: 14px;
+  color: #888;
+}
+
+.send-friend-request-container button {
+  margin-left: auto;
+}

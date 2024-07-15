@@ -1,6 +1,6 @@
 import React from 'react';
 import FriendsList from '../components/Friends/FriendList/FriendsList';
-import SendFriendRequest from '../components/Friends/FriendRequest/SendFriendRequest';
+import SendFriendRequest from '../components/Friends/SendFriendRequest/SendFriendRequest';
 
 const FriendsPage = () => (
   <div>

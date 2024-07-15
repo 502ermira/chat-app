@@ -1,55 +1,74 @@
 .respond-friend-request {
-    padding: 20px;
-  }
-  
-  .respond-friend-request h1 {
-    font-size: 24px;
-    margin-bottom: 20px;
-  }
-  
-  .request-list {
-    list-style-type: none;
-    padding: 0;
-  }
-  
-  .request-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 23px;
-    border-radius: 5px;
-    margin-bottom: 10px;
-    background-color: #f9f9f9;
-  }
-  
-  .requester-username {
-    font-size: 18px;
-  }
-  
-  .buttons-container {
-    display: flex;
-    gap: 5px;
-  }
-  
-  .respond-button {
-    padding: 5px 10px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  
-  .respond-button.accept {
-    background-color: #4caf50;
-    color: white;
-  }
-  
-  .respond-button.decline {
-    background-color: #f44336;
-    color: white;
-  }
-  
-  .message {
-    margin-top: 20px;
-    font-size: 16px;
-    color: #4caf50;
-  }
+  padding: 20px;
+}
+
+.request-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.request-item {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  cursor: pointer;
+  border-bottom: 1px solid #ccc;
+}
+
+.request-item:hover {
+  background-color: #f0f0f0;
+}
+
+.requester-profile-picture {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.requester-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.requester-full-name {
+  font-weight: bold;
+}
+
+.requester-username {
+  color: #555;
+}
+
+.request-pending {
+  display: flex;
+  align-items: center;
+}
+
+.buttons-container {
+  margin-left: auto;
+}
+
+.respond-button {
+  cursor: pointer;
+  border: none;
+  padding: 8px 16px;
+  margin-right: 10px;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+.accept {
+  background-color: #4caf50;
+  color: white;
+}
+
+.decline {
+  background-color: #f44336;
+  color: white;
+}
+
+.message {
+  margin-top: 10px;
+  color: #f44336;
+}
