@@ -102,9 +102,6 @@ const SendFriendRequest = () => {
     const isFriend = userFriends.some(friend => friend._id === userId);
     if (isFriend) {
       navigate(`/chat/${userId}`);
-    } else {
-      // Handle click action for non-friends (optional)
-      console.log(`Click action for non-friend user with ID ${userId}`);
     }
   };
 

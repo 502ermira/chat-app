@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
 import { useAuth } from './AuthContext';
 
@@ -30,7 +30,7 @@ export const SocketProvider = ({ children }) => {
 
       return () => newSocket.close();
     }
-  }, [token]); 
+  }, [token]);
 
   return (
     <SocketContext.Provider value={socket}>

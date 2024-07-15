@@ -50,6 +50,7 @@ exports.sendFriendRequest = async (req, res) => {
     if (declinedRequest) {
       declinedRequest.status = 'pending';
       await declinedRequest.save();
+      req.io.to(recipient._id.toString()).emit('friend-request-received');
       return res.status(201).json(declinedRequest);
     }
 
@@ -58,6 +59,7 @@ exports.sendFriendRequest = async (req, res) => {
       recipient: recipient._id,
     });
 
+    req.io.to(recipient._id.toString()).emit('friend-request-received');
     res.status(201).json(friendRequest);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -96,6 +98,7 @@ exports.respondToFriendRequest = async (req, res) => {
       await User.findByIdAndUpdate(recipientId, { $push: { friends: requesterId } });
     }
 
+    req.io.to(friendRequest.requester._id.toString()).emit('friend-request-responded');
     res.status(200).json(friendRequest);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -159,5 +162,16 @@ exports.getUserById = async (req, res) => {
     res.json(user);
   } catch (error) {
     res.status (500).json({ message: error.message });
+  }
+};
+exports.getFriendRequestCount = async (req, res) => {
+  try {
+    const count = await FriendRequest.countDocuments({
+      recipient: req.user._id,
+      status: 'pending',
+    });
+    res.json({ count });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 };

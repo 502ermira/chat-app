@@ -19,4 +19,13 @@
     font-weight: bold;
     border-bottom: 2px solid white;
   }
+  .bottom-nav .badge {
+    background-color: red;
+    color: white;
+    border-radius: 50%;
+    padding: 0.2em 0.5em;
+    font-size: 0.8em;
+    vertical-align: top;
+    margin-left: 0.3em;
+  }
   

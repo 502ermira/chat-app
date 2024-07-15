@@ -27,6 +27,12 @@ const io = new Server(server, {
 app.use(cors());
 app.use(express.json({ limit: '11mb' }));
 
+// Middleware to add io to req
+app.use((req, res, next) => {
+  req.io = io;
+  next();
+});
+
 // Middleware to authenticate socket connections
 io.use((socket, next) => {
   const token = socket.handshake.auth.token;

@@ -7,6 +7,7 @@ import FriendsPage from './pages/FriendsPage';
 import RequestsPage from './pages/RequestsPage';
 import RecentChatsPage from './pages/RecentChatsPage';
 import BottomNav from './BottomNav/BottomNav';
+import { FriendRequestProvider } from './contexts/FriendRequestContext';
 import { SocketProvider } from './contexts/SocketContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import './App.css';
@@ -36,9 +37,11 @@ const App = () => {
   return (
     <AuthProvider>
       <SocketProvider>
+       <FriendRequestProvider>
         <Router>
           <AppRoutes />
         </Router>
+       </FriendRequestProvider>
       </SocketProvider>
     </AuthProvider>
   );
