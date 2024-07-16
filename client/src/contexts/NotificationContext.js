@@ -20,8 +20,12 @@ export const NotificationProvider = ({ children }) => {
     }, 5000);
   }, []);
 
+  const clearNotifications = useCallback(() => {
+    setNotifications([]);
+  }, []);
+
   return (
-    <NotificationContext.Provider value={{ notifications, addNotification }}>
+    <NotificationContext.Provider value={{ notifications, addNotification, clearNotifications }}>
       {children}
     </NotificationContext.Provider>
   );

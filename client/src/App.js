@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate, useMatch } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useMatch, useLocation } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 import HomePage from './pages/HomePage';
@@ -11,13 +11,16 @@ import { SocketProvider } from './contexts/SocketContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { FriendRequestProvider } from './contexts/FriendRequestContext';
 import { UnseenMessagesProvider } from './contexts/UnseenMessagesContext';
-import { NotificationProvider } from './contexts/NotificationContext'; 
-import Notification from './components/Notification/Notification'; 
+import { NotificationProvider } from './contexts/NotificationContext';
+import Notification from './components/Notification/Notification';
 import './App.css';
 
 const AppRoutes = () => {
   const { user } = useAuth();
   const isChatPage = useMatch('/chat/:friendId');
+  const location = useLocation();
+
+  const hideNotifications = location.pathname === '/recent-chats';
 
   return (
     <>
@@ -31,7 +34,7 @@ const AppRoutes = () => {
         <Route path="/recent-chats" element={user ? <RecentChatsPage /> : <Navigate to="/login" />} />
       </Routes>
       {!isChatPage && <BottomNav />}
-      <Notification /> 
+      <Notification hideNotifications={hideNotifications} />
     </>
   );
 };
@@ -40,7 +43,7 @@ const App = () => {
   return (
     <AuthProvider>
       <SocketProvider>
-        <NotificationProvider>  
+        <NotificationProvider>
           <UnseenMessagesProvider>
             <FriendRequestProvider>
               <Router>

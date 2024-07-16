@@ -3,7 +3,7 @@ import './Notification.css';
 import { useNotification } from '../../contexts/NotificationContext';
 import { useNavigate, useMatch } from 'react-router-dom';
 
-const Notification = () => {
+const Notification = ({ hideNotifications }) => {
   const { notifications } = useNotification();
   const navigate = useNavigate();
   const chatMatch = useMatch('/chat/:friendId');
@@ -12,6 +12,10 @@ const Notification = () => {
   const handleClick = (notification) => {
     navigate(`/chat/${notification.senderId}`);
   };
+
+  if (hideNotifications) {
+    return null;
+  }
 
   return (
     <div className="notification-container">
