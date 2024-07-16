@@ -10,6 +10,7 @@ import BottomNav from './BottomNav/BottomNav';
 import { SocketProvider } from './contexts/SocketContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { FriendRequestProvider } from './contexts/FriendRequestContext';
+import { UnseenMessagesProvider } from './contexts/UnseenMessagesContext';
 import './App.css';
 
 const AppRoutes = () => {
@@ -36,11 +37,13 @@ const App = () => {
   return (
     <AuthProvider>
       <SocketProvider>
-        <FriendRequestProvider>
-          <Router>
-            <AppRoutes />
-          </Router>
-        </FriendRequestProvider>
+      <UnseenMessagesProvider>
+         <FriendRequestProvider>
+           <Router>
+             <AppRoutes />
+           </Router>
+         </FriendRequestProvider>
+        </UnseenMessagesProvider>
       </SocketProvider>
     </AuthProvider>
   );

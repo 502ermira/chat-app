@@ -4,9 +4,11 @@ import './RecentChats.css';
 import API from '../../api';
 import { useSocket } from '../../contexts/SocketContext';
 import { useAuth } from '../../contexts/AuthContext';
+import { useUnseenMessages } from '../../contexts/UnseenMessagesContext';
 
 const RecentChats = () => {
   const { user } = useAuth();
+  const { fetchUnseenMessagesCount } = useUnseenMessages();
   const [recentChats, setRecentChats] = useState([]);
   const [loading, setLoading] = useState(true);
   const socket = useSocket();
@@ -39,11 +41,11 @@ const RecentChats = () => {
     } else {
       console.log('User not found in context');
     }
-  }, [user, location]); 
+  }, [user, location]);
 
   useEffect(() => {
     if (socket) {
-      socket.on('receive_message', (newMessage) => {
+      const handleReceiveMessage = (newMessage) => {
         setRecentChats((prevChats) => {
           const updatedChats = prevChats.map((chat) => {
             if (chat.friend._id === newMessage.sender._id) {
@@ -67,9 +69,10 @@ const RecentChats = () => {
 
           return updatedChats;
         });
-      });
+        fetchUnseenMessagesCount();
+      };
 
-      socket.on('messages_seen', ({ friendId }) => {
+      const handleMessagesSeen = ({ friendId }) => {
         setRecentChats((prevChats) => {
           const updatedChats = prevChats.map((chat) => {
             if (chat.friend._id === friendId) {
@@ -82,14 +85,18 @@ const RecentChats = () => {
           });
           return updatedChats;
         });
-      });
+        fetchUnseenMessagesCount();
+      };
+
+      socket.on('receive_message', handleReceiveMessage);
+      socket.on('messages_seen', handleMessagesSeen);
 
       return () => {
-        socket.off('receive_message');
-        socket.off('messages_seen');
+        socket.off('receive_message', handleReceiveMessage);
+        socket.off('messages_seen', handleMessagesSeen);
       };
     }
-  }, [socket]);
+  }, [socket, fetchUnseenMessagesCount]);
 
   const formatDate = (timestamp) => {
     const date = new Date(timestamp);

@@ -67,37 +67,38 @@ const Chat = ({ friendId, userId }) => {
   }, [messages]);
 
   useEffect(() => {
+    const handleReceiveMessage = (data) => {
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        { ...data, timestamp: new Date(data.timestamp), seenAt: data.seenAt ? new Date(data.seenAt) : null },
+      ]);
+      if (messagesEndRef.current) {
+        messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+      }
+      if (socket.connected) {
+        socket.emit('messages_seen', { friendId });
+      }
+    };
+
+    const handleMessagesSeen = ({ friendId: senderId }) => {
+      setMessages((prevMessages) =>
+        prevMessages.map((msg) =>
+          msg.sender._id === senderId ? { ...msg, seen: true, seenAt: msg.seenAt || new Date() } : msg
+        )
+      );
+    };
+
     if (socket) {
-      socket.on('connect', () => {
-        console.log('Socket connected');
-      });
-  
-      socket.on('receive_message', (data) => {
-        setMessages((prevMessages) => [
-          ...prevMessages,
-          { ...data, timestamp: new Date(data.timestamp), seenAt: data.seenAt ? new Date(data.seenAt) : null },
-        ]);
-        if (messagesEndRef.current) {
-          messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-        }
-        if (socket.connected) {
-          socket.emit('messages_seen', { friendId });
-        }
-      });
-  
-      socket.on('messages_seen', ({ friendId: senderId }) => {
-        setMessages((prevMessages) =>
-          prevMessages.map((msg) =>
-            msg.sender._id === senderId ? { ...msg, seen: true, seenAt: msg.seenAt || new Date() } : msg
-          )
-        );
-      });
-  
-      return () => {
-        socket.off('receive_message');
-        socket.off('messages_seen');
-      };
+      socket.on('receive_message', handleReceiveMessage);
+      socket.on('messages_seen', handleMessagesSeen);
     }
+
+    return () => {
+      if (socket) {
+        socket.off('receive_message', handleReceiveMessage);
+        socket.off('messages_seen', handleMessagesSeen);
+      }
+    };
   }, [socket, friendId]);
 
   const handleSendMessage = (e) => {
@@ -106,14 +107,14 @@ const Chat = ({ friendId, userId }) => {
       const formData = new FormData();
       formData.append('recipientId', friendId);
       formData.append('message', message);
-  
+
       if (image) {
         const reader = new FileReader();
         reader.onloadend = () => {
           const base64Image = reader.result.split(',')[1];
           formData.append('image', base64Image);
           formData.append('imageType', image.type);
-  
+
           const newMessage = {
             sender: { _id: userId },
             message,
@@ -122,7 +123,7 @@ const Chat = ({ friendId, userId }) => {
             seen: false,
             seenAt: null,
           };
-  
+
           socket.emit('send_message', Object.fromEntries(formData));
           setMessages((prevMessages) => [...prevMessages, newMessage]);
           setMessage('');
@@ -137,19 +138,13 @@ const Chat = ({ friendId, userId }) => {
           seen: false,
           seenAt: null,
         };
-  
+
         socket.emit('send_message', Object.fromEntries(formData));
         setMessages((prevMessages) => [...prevMessages, newMessage]);
         setMessage('');
       }
     }
   };
-
-  useEffect(() => {
-    if (socket && messages.length > 0 && socket.connected) {
-      socket.emit('messages_seen', { friendId });
-    }
-  }, [socket, messages, friendId]);
 
   const handleImageChange = (e) => {
     setImage(e.target.files[0]);
@@ -256,7 +251,7 @@ const Chat = ({ friendId, userId }) => {
               />
             )}
             {isSentMessage && msg.seen && (
-              <span className="seen-status">
+              <span className="              seen-status">
                 Seen at {formatTime(new Date(msg.seenAt))}
               </span>
             )}
@@ -268,7 +263,7 @@ const Chat = ({ friendId, userId }) => {
     const formatTimeSince = (timestamp) => {
       const now = new Date();
       const diff = now - timestamp;
-      
+
       const seconds = Math.floor(diff / 1000);
       const minutes = Math.floor(diff / (1000 * 60));
       const hours = Math.floor(diff / (1000 * 60 * 60));
@@ -276,7 +271,7 @@ const Chat = ({ friendId, userId }) => {
       const weeks = Math.floor(diff / (1000 * 60 * 60 * 24 * 7));
       const months = Math.floor(diff / (1000 * 60 * 60 * 24 * 30));
       const years = Math.floor(diff / (1000 * 60 * 60 * 24 * 365));
-    
+
       if (years > 0) {
         return years === 1 ? 'a year ago' : `${years} years ago`;
       }
@@ -296,7 +291,7 @@ const Chat = ({ friendId, userId }) => {
         return minutes === 1 ? 'a minute ago' : `${minutes} minutes ago`;
       }
       return seconds === 1 ? 'a second ago' : `${seconds} seconds ago`;
-    };    
+    };
 
     if (lastMessageSentByUser && lastMessageSentByUser.seen) {
       lastMessageSeen = (
