@@ -11,6 +11,8 @@ import { SocketProvider } from './contexts/SocketContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { FriendRequestProvider } from './contexts/FriendRequestContext';
 import { UnseenMessagesProvider } from './contexts/UnseenMessagesContext';
+import { NotificationProvider } from './contexts/NotificationContext'; 
+import Notification from './components/Notification/Notification'; 
 import './App.css';
 
 const AppRoutes = () => {
@@ -29,6 +31,7 @@ const AppRoutes = () => {
         <Route path="/recent-chats" element={user ? <RecentChatsPage /> : <Navigate to="/login" />} />
       </Routes>
       {!isChatPage && <BottomNav />}
+      <Notification /> 
     </>
   );
 };
@@ -37,13 +40,15 @@ const App = () => {
   return (
     <AuthProvider>
       <SocketProvider>
-      <UnseenMessagesProvider>
-         <FriendRequestProvider>
-           <Router>
-             <AppRoutes />
-           </Router>
-         </FriendRequestProvider>
-        </UnseenMessagesProvider>
+        <NotificationProvider>  
+          <UnseenMessagesProvider>
+            <FriendRequestProvider>
+              <Router>
+                <AppRoutes />
+              </Router>
+            </FriendRequestProvider>
+          </UnseenMessagesProvider>
+        </NotificationProvider>
       </SocketProvider>
     </AuthProvider>
   );
