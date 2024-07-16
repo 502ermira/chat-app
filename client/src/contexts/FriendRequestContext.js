@@ -12,6 +12,7 @@ export const FriendRequestProvider = ({ children }) => {
 
   const fetchFriendRequestCount = async () => {
     const token = localStorage.getItem('token');
+    if (!token) return;
     try {
       const { data } = await API.get('/friends/requests/count', {
         headers: { Authorization: `Bearer ${token}` },

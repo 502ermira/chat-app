@@ -10,7 +10,6 @@ const RespondFriendRequest = () => {
   const socket = useSocket();
   const { fetchFriendRequestCount } = useFriendRequest();
   const [requests, setRequests] = useState([]);
-  const [respondedRequests, setRespondedRequests] = useState([]);
   const [showRequests, setShowRequests] = useState(false);
   const [message, setMessage] = useState('');
 
@@ -49,26 +48,31 @@ const RespondFriendRequest = () => {
   const handleRespond = async (requestId, status) => {
     const token = localStorage.getItem('token');
     try {
+      if (!token) {
+        throw new Error('Token not found');
+      }
+  
       const { data } = await API.post('/friends/respond', { requestId, status }, {
         headers: { Authorization: `Bearer ${token}` },
       });
+  
       setRequests(requests.map(request =>
         request._id === requestId
           ? { ...request, status, respondedAt: new Date().toISOString() }
           : request
       ));
-      setRespondedRequests([...respondedRequests, requestId]);
+      
       console.log(`Responded to request ${requestId} with status ${status}`);
-      if (socket) {
-        socket.emit('friend-request-responded');
-      }
+      
+      // Fetch the latest friend request count
       fetchFriendRequestCount();
+      
     } catch (error) {
-      setMessage(error.response.data.message || `Error ${status} friend request`);
+      setMessage(error.response?.data?.message || `Error ${status} friend request`);
       console.error(`Error responding to request ${requestId} with status ${status}:`, error);
     }
   };
-
+  
   const renderMessage = (request) => {
     const isRequester = user._id === request.requester._id;
     const otherUser = isRequester ? request.recipient : request.requester;
@@ -88,7 +92,8 @@ const RespondFriendRequest = () => {
     }
   };
 
-  const pendingRequests = requests.filter(request => request.status === 'pending');
+  const receivedRequests = requests.filter(request => request.recipient._id === user._id);
+  const pendingRequests = receivedRequests.filter(request => request.status === 'pending');
 
   return (
     <div className="respond-friend-request">
@@ -111,14 +116,8 @@ const RespondFriendRequest = () => {
                 <p className="requester-username">@{request.friend.username}</p>
               </div>
               <div className="buttons-container">
-                {user._id === request.recipient._id ? (
-                  <>
-                    <button className="respond-button accept" onClick={() => handleRespond(request._id, 'accepted')}>Accept</button>
-                    <button className="respond-button decline" onClick={() => handleRespond(request._id, 'declined')}>Decline</button>
-                  </>
-                ) : (
-                  <span className="request-status">Pending</span>
-                )}
+                <button className="respond-button accept" onClick={() => handleRespond(request._id, 'accepted')}>Accept</button>
+                <button className="respond-button decline" onClick={() => handleRespond(request._id, 'declined')}>Decline</button>
               </div>
             </li>
           ))}
@@ -140,16 +139,10 @@ const RespondFriendRequest = () => {
             </div>
             <span className="notification">
               {renderMessage(request)}
-              {request.status === 'pending' && (
+              {request.status === 'pending' && request.recipient._id === user._id && (
                 <div className="buttons-container">
-                  {user._id === request.recipient._id ? (
-                    <>
-                      <button className="respond-button accept" onClick={() => handleRespond(request._id, 'accepted')}>Accept</button>
-                      <button className="respond-button decline" onClick={() => handleRespond(request._id, 'declined')}>Decline</button>
-                    </>
-                  ) : (
-                    <span className="request-status">Pending</span>
-                  )}
+                  <button className="respond-button accept" onClick={() => handleRespond(request._id, 'accepted')}>Accept</button>
+                  <button className="respond-button decline" onClick={() => handleRespond(request._id, 'declined')}>Decline</button>
                 </div>
               )}
             </span>
