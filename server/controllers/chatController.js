@@ -91,3 +91,17 @@ exports.getRecentChats = async (req, res) => {
   }
 };
 
+exports.getUnseenMessagesCount = async (req, res) => {
+  const userId = req.user._id;
+
+  try {
+    const unseenCount = await Message.countDocuments({
+      recipient: userId,
+      seen: false,
+    });
+
+    res.json({ count: unseenCount });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

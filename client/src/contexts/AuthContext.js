@@ -14,7 +14,7 @@ export const AuthProvider = ({ children }) => {
   const login = (token) => {
     localStorage.setItem('token', token);
     const decodedToken = jwtDecode(token);
-    setUser({ _id: decodedToken.id, username: decodedToken.username, email: decodedToken.email }); // ensure it includes _id and username
+    setUser({ _id: decodedToken.id, username: decodedToken.username, email: decodedToken.email });
     setToken(token);
   };
 
@@ -43,8 +43,12 @@ export const AuthProvider = ({ children }) => {
       setLoading(false);
     };
 
-    verifyToken();
-  }, []);
+    if (!user && token) {
+      verifyToken();
+    } else {
+      setLoading(false);
+    }
+  }, [user, token]);
 
   return (
     <AuthContext.Provider value={{ user, token, login, logout }}>
