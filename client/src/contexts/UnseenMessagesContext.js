@@ -31,12 +31,13 @@ export const UnseenMessagesProvider = ({ children }) => {
     if (socket) {
       const handleReceiveMessage = (newMessage) => {
         setUnseenMessagesCount((prevCount) => prevCount + 1);
+        const currentFriendId = window.location.pathname.split('/chat/')[1];
         addNotification({
           username: newMessage.sender.username,
           message: newMessage.message,
           timestamp: new Date(newMessage.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
           senderId: newMessage.sender._id,
-        });
+        }, currentFriendId);
       };
 
       const handleMessagesSeen = () => {

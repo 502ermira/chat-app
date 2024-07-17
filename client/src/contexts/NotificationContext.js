@@ -8,16 +8,18 @@ export const NotificationProvider = ({ children }) => {
   const [notifications, setNotifications] = useState([]);
   const timeoutRef = useRef(null);
 
-  const addNotification = useCallback((notification) => {
-    setNotifications([notification]);
+  const addNotification = useCallback((notification, currentFriendId) => {
+    if (notification.senderId !== currentFriendId) {
+      setNotifications([notification]);
 
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+
+      timeoutRef.current = setTimeout(() => {
+        setNotifications([]);
+      }, 5000);
     }
-
-    timeoutRef.current = setTimeout(() => {
-      setNotifications([]);
-    }, 5000);
   }, []);
 
   const clearNotifications = useCallback(() => {
