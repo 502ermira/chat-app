@@ -41,28 +41,24 @@ exports.sendFriendRequest = async (req, res) => {
       return res.status(400).json({ message: 'You already have a friend request from this user' });
     }
 
-    const declinedRequest = await FriendRequest.findOne({
+    const newRequest = new FriendRequest({
       requester: requesterId,
       recipient: recipient._id,
-      status: 'declined'
+      status: 'pending'
     });
 
-    if (declinedRequest) {
-      declinedRequest.status = 'pending';
-      await declinedRequest.save();
-      req.io.to(recipient._id.toString()).emit('friend-request-received');
-      return res.status(201).json(declinedRequest);
-    }
+    await newRequest.save();
 
-    const friendRequest = await FriendRequest.create({
-      requester: requesterId,
-      recipient: recipient._id,
+    req.io.to(recipient._id.toString()).emit('friend-request-received', {
+      requester: {
+        _id: req.user._id,
+        username: req.user.username,
+      },
     });
 
-    req.io.to(recipient._id.toString()).emit('friend-request-received');
-    res.status(201).json(friendRequest);
+    res.status(201).json({ message: 'Friend request sent' });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: 'Internal server error' });
   }
 };
 

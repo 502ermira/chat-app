@@ -1,6 +1,7 @@
-import { createContext, useState, useContext, useEffect } from 'react';
+import { createContext, useState, useContext, useEffect, useCallback } from 'react';
 import API from '../api';
 import { useSocket } from './SocketContext';
+import { useNotification } from './NotificationContext';
 
 const FriendRequestContext = createContext();
 
@@ -9,8 +10,9 @@ export const useFriendRequest = () => useContext(FriendRequestContext);
 export const FriendRequestProvider = ({ children }) => {
   const [friendRequestCount, setFriendRequestCount] = useState(0);
   const socket = useSocket();
+  const { addNotification } = useNotification();
 
-  const fetchFriendRequestCount = async () => {
+  const fetchFriendRequestCount = useCallback(async () => {
     const token = localStorage.getItem('token');
     if (!token) return;
     try {
@@ -21,28 +23,36 @@ export const FriendRequestProvider = ({ children }) => {
     } catch (error) {
       console.error('Error fetching friend request count:', error);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchFriendRequestCount();
 
     if (socket) {
-      socket.on('friend-request-received', () => {
+      const handleFriendRequestReceived = (request) => {
         setFriendRequestCount((prevCount) => prevCount + 1);
-      });
+        addNotification({
+          username: request.requester.username,
+          message: 'sent you a friend request',
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          senderId: request.requester._id,
+        });
+      };
 
-      socket.on('friend-request-responded', () => {
+      const handleFriendRequestResponded = () => {
         setFriendRequestCount((prevCount) => prevCount - 1);
-      });
-    }
+        fetchFriendRequestCount();
+      };
 
-    return () => {
-      if (socket) {
-        socket.off('friend-request-received');
-        socket.off('friend-request-responded');
-      }
-    };
-  }, [socket]);
+      socket.on('friend-request-received', handleFriendRequestReceived);
+      socket.on('friend-request-responded', handleFriendRequestResponded);
+
+      return () => {
+        socket.off('friend-request-received', handleFriendRequestReceived);
+        socket.off('friend-request-responded', handleFriendRequestResponded);
+      };
+    }
+  }, [socket, fetchFriendRequestCount, addNotification]);
 
   return (
     <FriendRequestContext.Provider value={{ friendRequestCount, fetchFriendRequestCount }}>
