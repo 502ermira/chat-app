@@ -37,6 +37,7 @@ export const UnseenMessagesProvider = ({ children }) => {
           message: newMessage.message,
           timestamp: new Date(newMessage.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
           senderId: newMessage.sender._id,
+          type: 'message'
         }, currentFriendId);
       };
 

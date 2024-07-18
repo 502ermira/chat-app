@@ -1,4 +1,4 @@
-import { createContext, useState, useContext, useEffect, useCallback } from 'react';
+import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
 import API from '../api';
 import { useSocket } from './SocketContext';
 import { useNotification } from './NotificationContext';
@@ -36,6 +36,7 @@ export const FriendRequestProvider = ({ children }) => {
           message: 'sent you a friend request',
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
           senderId: request.requester._id,
+          type: 'friendRequest'
         });
       };
 

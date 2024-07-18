@@ -6,7 +6,13 @@ const RecentChatsPage = () => {
   const { clearNotifications } = useNotification();
 
   useEffect(() => {
-    clearNotifications();
+    const timeoutId = setTimeout(() => {
+      clearNotifications();
+    }, 5000);
+
+    return () => {
+      clearTimeout(timeoutId);
+    };
   }, [clearNotifications]);
 
   return (
