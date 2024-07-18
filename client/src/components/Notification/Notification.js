@@ -25,9 +25,9 @@ const Notification = () => {
   }
 
   return (
-    <div className="notification-container">
+    <div className="notification-page-container">
       {notifications.length > 0 && (
-        <div className="notification" onClick={() => handleClick(notifications[0])}>
+        <div className="notification-item" onClick={() => handleClick(notifications[0])}>
           <p><strong>{notifications[0].username}</strong>: {notifications[0].message}</p>
           <p className="notification-timestamp">{notifications[0].timestamp}</p>
         </div>

@@ -154,7 +154,7 @@ const UserProfile = () => {
 
   return (
     <div className="user-profile">
-      {message && <div className="message">{message}</div>}
+      {message && <div className="user-profile-message">{message}</div>}
       {error && <div className="error">{error}</div>}
       {editing ? (
         <div className="edit-form">

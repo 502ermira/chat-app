@@ -1,4 +1,4 @@
-.notification-container {
+.notification-page-container {
     position: fixed;
     top: 0;
     width: 100%;
@@ -8,7 +8,7 @@
     z-index: 1000;
   }
   
-  .notification {
+  .notification-item {
     background-color: #444;
     color: white;
     padding: 10px;
@@ -19,7 +19,7 @@
     max-width: 400px;
   }
   
-  .notification-timestamp {
+  .notification-page-timestamp {
     font-size: 0.8em;
     color: #ccc;
   }

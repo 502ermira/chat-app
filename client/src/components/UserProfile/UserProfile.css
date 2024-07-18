@@ -8,7 +8,7 @@
   position: relative; 
 }
 
-.message, .error {
+.user-profile-message, .error {
   position: absolute;
   left: 50%; 
   top:23px;
@@ -19,7 +19,7 @@
   text-align: center;
 }
 
-.message {
+.user-profile-message {
   background-color: #2e7d32;
   margin-left:40%;
 }

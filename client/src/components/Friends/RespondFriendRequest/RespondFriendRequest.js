@@ -21,7 +21,7 @@ const RespondFriendRequest = () => {
       });
       const updatedRequests = data.map(request => ({
         ...request,
-        friend: user._id === request.requester._id ? request.recipient : request.requester
+        friend: user.id === request.requester._id ? request.recipient : request.requester
       }));
       setRequests(updatedRequests);
     } catch (error) {
@@ -43,7 +43,7 @@ const RespondFriendRequest = () => {
         socket.off('friend-request-responded', fetchRequests);
       }
     };
-  }, [socket, user._id]);
+  }, [socket, user.id]);
 
   const handleRespond = async (requestId, status) => {
     const token = localStorage.getItem('token');
@@ -61,10 +61,7 @@ const RespondFriendRequest = () => {
           ? { ...request, status, respondedAt: new Date().toISOString() }
           : request
       ));
-      
-      console.log(`Responded to request ${requestId} with status ${status}`);
-      
-      // Fetch the latest friend request count
+
       fetchFriendRequestCount();
       
     } catch (error) {
@@ -74,7 +71,7 @@ const RespondFriendRequest = () => {
   };
   
   const renderMessage = (request) => {
-    const isRequester = user._id === request.requester._id;
+    const isRequester = user.id === request.requester._id;
     const otherUser = isRequester ? request.recipient : request.requester;
 
     if (request.status === 'accepted') {
@@ -92,7 +89,7 @@ const RespondFriendRequest = () => {
     }
   };
 
-  const receivedRequests = requests.filter(request => request.recipient._id === user._id);
+  const receivedRequests = requests.filter(request => request.recipient._id === user.id);
   const pendingRequests = receivedRequests.filter(request => request.status === 'pending');
 
   return (
@@ -137,9 +134,9 @@ const RespondFriendRequest = () => {
               <p className="requester-full-name">{request.friend.fullName}</p>
               <p className="requester-username">@{request.friend.username}</p>
             </div>
-            <span className="notification">
+            <span className="request-notification">
               {renderMessage(request)}
-              {request.status === 'pending' && request.recipient._id === user._id && (
+              {request.status === 'pending' && request.recipient._id === user.id && (
                 <div className="buttons-container">
                   <button className="respond-button accept" onClick={() => handleRespond(request._id, 'accepted')}>Accept</button>
                   <button className="respond-button decline" onClick={() => handleRespond(request._id, 'declined')}>Decline</button>
@@ -150,7 +147,7 @@ const RespondFriendRequest = () => {
         ))}
       </ul>
 
-      {message && <p className="message">{message}</p>}
+      {message && <p className="request-message">{message}</p>}
     </div>
   );
 };
