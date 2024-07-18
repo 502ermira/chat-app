@@ -89,7 +89,6 @@ exports.respondToFriendRequest = async (req, res) => {
 
     if (status === 'accepted') {
       const requesterId = friendRequest.requester._id;
-
       await User.findByIdAndUpdate(requesterId, { $push: { friends: recipientId } });
       await User.findByIdAndUpdate(recipientId, { $push: { friends: requesterId } });
     }
