@@ -17,20 +17,20 @@ export const SocketProvider = ({ children }) => {
       const newSocket = io('http://localhost:5000', {
         auth: { token },
       });
-
+  
       newSocket.on('connect', () => {
         console.log('Socket connected');
       });
-
+  
       newSocket.on('disconnect', () => {
         console.log('Socket disconnected');
       });
-
+  
       setSocket(newSocket);
-
+  
       return () => newSocket.close();
     }
-  }, [token]);
+  }, [token]);  
 
   return (
     <SocketContext.Provider value={socket}>

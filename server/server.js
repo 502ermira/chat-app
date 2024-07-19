@@ -114,6 +114,15 @@ io.on('connection', (socket) => {
     }
   });
 
+  // Handle typing events
+  socket.on('typing', ({ friendId }) => {
+    io.to(friendId).emit('typing');
+  });
+
+  socket.on('stop_typing', ({ friendId }) => {
+    io.to(friendId).emit('stop_typing');
+  });
+
   socket.on('disconnect', () => {
     console.log('user disconnected');
   });

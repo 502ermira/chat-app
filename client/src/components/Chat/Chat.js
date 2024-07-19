@@ -13,9 +13,12 @@ const Chat = ({ friendId, userId }) => {
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
+  const [isTyping, setIsTyping] = useState(false);
+  const [friendTyping, setFriendTyping] = useState(false);
   const socket = useSocket();
   const messagesEndRef = useRef(null);
   const observer = useRef();
+  const typingTimeoutRef = useRef(null);
 
   useEffect(() => {
     const fetchFriendUsername = async () => {
@@ -88,15 +91,27 @@ const Chat = ({ friendId, userId }) => {
       );
     };
 
+    const handleTyping = () => {
+      setFriendTyping(true);
+    };
+
+    const handleStopTyping = () => {
+      setFriendTyping(false);
+    };
+
     if (socket) {
       socket.on('receive_message', handleReceiveMessage);
       socket.on('messages_seen', handleMessagesSeen);
+      socket.on('typing', handleTyping);
+      socket.on('stop_typing', handleStopTyping);
     }
 
     return () => {
       if (socket) {
         socket.off('receive_message', handleReceiveMessage);
         socket.off('messages_seen', handleMessagesSeen);
+        socket.off('typing', handleTyping);
+        socket.off('stop_typing', handleStopTyping);
       }
     };
   }, [socket, friendId]);
@@ -142,6 +157,12 @@ const Chat = ({ friendId, userId }) => {
         socket.emit('send_message', Object.fromEntries(formData));
         setMessages((prevMessages) => [...prevMessages, newMessage]);
         setMessage('');
+      }
+
+      // Stop typing indication
+      if (isTyping) {
+        socket.emit('stop_typing', { friendId });
+        setIsTyping(false);
       }
     }
   };
@@ -251,7 +272,7 @@ const Chat = ({ friendId, userId }) => {
               />
             )}
             {isSentMessage && msg.seen && (
-              <span className="              seen-status">
+              <span className="seen-status">
                 Seen at {formatTime(new Date(msg.seenAt))}
               </span>
             )}
@@ -315,10 +336,32 @@ const Chat = ({ friendId, userId }) => {
     }
   }, [socket, messages, friendId]);
 
+  const handleInputChange = (e) => {
+    setMessage(e.target.value);
+
+    if (!isTyping && e.target.value.trim()) {
+      setIsTyping(true);
+      socket.emit('typing', { friendId });
+
+      clearTimeout(typingTimeoutRef.current);
+      typingTimeoutRef.current = setTimeout(() => {
+        setIsTyping(false);
+        socket.emit('stop_typing', { friendId });
+      }, 3000);
+    } else {
+      clearTimeout(typingTimeoutRef.current);
+      typingTimeoutRef.current = setTimeout(() => {
+        setIsTyping(false);
+        socket.emit('stop_typing', { friendId });
+      }, 3000);
+    }
+  };
+
   return (
     <div className="chat-container">
       <div className="chat-header">
         <h2>{friendUsername}</h2>
+        {friendTyping && <div className="typing-indicator">Typing...</div>}
       </div>
       <ul className="message-list">
         {renderMessages()}
@@ -328,7 +371,7 @@ const Chat = ({ friendId, userId }) => {
         <input
           type="text"
           value={message}
-          onChange={(e) => setMessage(e.target.value)}
+          onChange={handleInputChange}
           placeholder="Type a message..."
         />
         <label className="image-upload-label">
