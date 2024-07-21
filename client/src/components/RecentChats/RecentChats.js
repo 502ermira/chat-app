@@ -11,6 +11,7 @@ const RecentChats = () => {
   const { fetchUnseenMessagesCount } = useUnseenMessages();
   const [recentChats, setRecentChats] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [typingIndicators, setTypingIndicators] = useState({});
   const socket = useSocket();
   const location = useLocation();
 
@@ -88,12 +89,30 @@ const RecentChats = () => {
         fetchUnseenMessagesCount();
       };
 
+      const handleTyping = ({ friendId }) => {
+        setTypingIndicators((prevIndicators) => ({
+          ...prevIndicators,
+          [friendId]: true,
+        }));
+      };
+
+      const handleStopTyping = ({ friendId }) => {
+        setTypingIndicators((prevIndicators) => ({
+          ...prevIndicators,
+          [friendId]: false,
+        }));
+      };
+
       socket.on('receive_message', handleReceiveMessage);
       socket.on('messages_seen', handleMessagesSeen);
+      socket.on('typing', handleTyping);
+      socket.on('stop_typing', handleStopTyping);
 
       return () => {
         socket.off('receive_message', handleReceiveMessage);
         socket.off('messages_seen', handleMessagesSeen);
+        socket.off('typing', handleTyping);
+        socket.off('stop_typing', handleStopTyping);
       };
     }
   }, [socket, fetchUnseenMessagesCount]);
@@ -127,8 +146,14 @@ const RecentChats = () => {
                       <p className="recent-chat-timestamp">{chat.lastMessage ? formatDate(chat.lastMessage.timestamp) : ''}</p>
                     </div>
                     <p className="recent-chat-message">
-                      {chat.lastMessage && isMeSender(chat.lastMessage.sender._id) ? 'Me: ' : ''}
-                      {chat.lastMessage ? chat.lastMessage.message : 'No messages yet'}
+                      {typingIndicators[chat.friend._id] ? (
+                        <em>Typing...</em>
+                      ) : (
+                        <>
+                          {chat.lastMessage && isMeSender(chat.lastMessage.sender._id) ? 'Me: ' : ''}
+                          {chat.lastMessage ? chat.lastMessage.message : 'No messages yet'}
+                        </>
+                      )}
                     </p>
                     {chat.unopenedCount > 0 && <span className="unopened-count">{chat.unopenedCount}</span>}
                   </div>

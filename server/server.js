@@ -52,7 +52,6 @@ io.use((socket, next) => {
   });
 });
 
-// Socket connection handling
 io.on('connection', (socket) => {
   console.log('a user connected');
   
@@ -116,11 +115,11 @@ io.on('connection', (socket) => {
 
   // Handle typing events
   socket.on('typing', ({ friendId }) => {
-    io.to(friendId).emit('typing');
+    io.to(friendId).emit('typing', { friendId: socket.user._id });
   });
 
   socket.on('stop_typing', ({ friendId }) => {
-    io.to(friendId).emit('stop_typing');
+    io.to(friendId).emit('stop_typing', { friendId: socket.user._id });
   });
 
   socket.on('disconnect', () => {
