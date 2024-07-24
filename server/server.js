@@ -52,6 +52,7 @@ io.use((socket, next) => {
   });
 });
 
+// Socket connection handling
 io.on('connection', (socket) => {
   console.log('a user connected');
   
@@ -98,7 +99,7 @@ io.on('connection', (socket) => {
           filter: { _id: message._id },
           update: {
             seen: true,
-            seenAt: message.seenAt || new Date() 
+            seenAt: new Date()
           }
         }
       }));
@@ -107,12 +108,14 @@ io.on('connection', (socket) => {
         await Message.bulkWrite(bulkOperations);
       }
 
-      io.to(friendId).emit('messages_seen', { friendId });
+      if (bulkOperations.length > 0) {
+        io.to(friendId).emit('messages_seen', { friendId: socket.user._id });
+      }
     } catch (error) {
       console.error('Error marking messages as seen:', error);
     }
   });
-
+    
   // Handle typing events
   socket.on('typing', ({ friendId }) => {
     io.to(friendId).emit('typing', { friendId: socket.user._id });

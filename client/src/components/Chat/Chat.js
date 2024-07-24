@@ -50,8 +50,8 @@ const Chat = ({ friendId, userId }) => {
         }));
         setMessages(fetchedMessages);
         setHasMore(data.length === 20);
-
-        if (socket && socket.connected) {
+  
+        if (socket && socket.connected && fetchedMessages.length > 0) {
           socket.emit('messages_seen', { friendId });
         }
       } catch (error) {
@@ -62,6 +62,7 @@ const Chat = ({ friendId, userId }) => {
     };
     fetchMessages();
   }, [friendId, socket]);
+  
 
   useEffect(() => {
     if (messagesEndRef.current) {
@@ -71,41 +72,56 @@ const Chat = ({ friendId, userId }) => {
 
   useEffect(() => {
     const handleReceiveMessage = (data) => {
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        { ...data, timestamp: new Date(data.timestamp), seenAt: data.seenAt ? new Date(data.seenAt) : null },
-      ]);
-      if (messagesEndRef.current) {
-        messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-      }
-      if (socket.connected) {
+      if (data.sender._id === friendId || data.recipient._id === friendId) {
+        setMessages((prevMessages) => [
+          ...prevMessages,
+          { ...data, timestamp: new Date(data.timestamp), seenAt: data.seenAt ? new Date(data.seenAt) : null },
+        ]);
+        if (messagesEndRef.current) {
+          messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
         socket.emit('messages_seen', { friendId });
       }
     };
-
-    const handleMessagesSeen = ({ friendId: senderId }) => {
-      setMessages((prevMessages) =>
-        prevMessages.map((msg) =>
-          msg.sender._id === senderId ? { ...msg, seen: true, seenAt: msg.seenAt || new Date() } : msg
-        )
-      );
+  
+    const handleMessagesSeen = async ({ friendId: senderId }) => {
+      if (senderId === friendId) {
+        try {
+          const token = localStorage.getItem('token');
+          const { data } = await API.get(`/messages/${friendId}?limit=20`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          const updatedMessages = data.map(msg => ({
+            ...msg,
+            timestamp: new Date(msg.timestamp),
+            seenAt: msg.seenAt ? new Date(msg.seenAt) : null,
+          }));
+          setMessages(updatedMessages);
+        } catch (error) {
+          console.error('Error fetching updated messages:', error);
+        }
+      }
     };
-
-    const handleTyping = () => {
-      setFriendTyping(true);
+  
+    const handleTyping = ({ friendId: typingFriendId }) => {
+      if (typingFriendId === friendId) {
+        setFriendTyping(true);
+      }
     };
-
-    const handleStopTyping = () => {
-      setFriendTyping(false);
+  
+    const handleStopTyping = ({ friendId: typingFriendId }) => {
+      if (typingFriendId === friendId) {
+        setFriendTyping(false);
+      }
     };
-
+  
     if (socket) {
       socket.on('receive_message', handleReceiveMessage);
       socket.on('messages_seen', handleMessagesSeen);
       socket.on('typing', handleTyping);
       socket.on('stop_typing', handleStopTyping);
     }
-
+  
     return () => {
       if (socket) {
         socket.off('receive_message', handleReceiveMessage);
@@ -115,21 +131,22 @@ const Chat = ({ friendId, userId }) => {
       }
     };
   }, [socket, friendId]);
-
+  
+  
   const handleSendMessage = (e) => {
     e.preventDefault();
     if ((message.trim() || image) && socket && socket.connected) {
       const formData = new FormData();
       formData.append('recipientId', friendId);
       formData.append('message', message);
-
+  
       if (image) {
         const reader = new FileReader();
         reader.onloadend = () => {
           const base64Image = reader.result.split(',')[1];
           formData.append('image', base64Image);
           formData.append('imageType', image.type);
-
+  
           const newMessage = {
             sender: { _id: userId },
             message,
@@ -138,7 +155,8 @@ const Chat = ({ friendId, userId }) => {
             seen: false,
             seenAt: null,
           };
-
+  
+          console.log('Emitting send_message event with message:', newMessage);
           socket.emit('send_message', Object.fromEntries(formData));
           setMessages((prevMessages) => [...prevMessages, newMessage]);
           setMessage('');
@@ -159,7 +177,6 @@ const Chat = ({ friendId, userId }) => {
         setMessage('');
       }
 
-      // Stop typing indication
       if (isTyping) {
         socket.emit('stop_typing', { friendId });
         setIsTyping(false);
@@ -212,12 +229,14 @@ const Chat = ({ friendId, userId }) => {
       const { data } = await API.get(`/messages/${friendId}?limit=20&before=${lastMessageTimestamp.toISOString()}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
+      const moreMessages = data.map(msg => ({
+        ...msg,
+        timestamp: new Date(msg.timestamp),
+        seenAt: msg.seenAt ? new Date(msg.seenAt) : null,
+      }));
+      console.log('Fetched more messages:', moreMessages);
       setMessages((prevMessages) => [
-        ...data.map(msg => ({
-          ...msg,
-          timestamp: new Date(msg.timestamp),
-          seenAt: msg.seenAt ? new Date(msg.seenAt) : null,
-        })),
+        ...moreMessages,
         ...prevMessages
       ]);
       setHasMore(data.length === 20);
@@ -227,7 +246,7 @@ const Chat = ({ friendId, userId }) => {
       setLoading(false);
     }
   };
-
+  
   const lastMessageElementRef = useCallback(node => {
     if (loading) return;
     if (observer.current) observer.current.disconnect();
@@ -238,7 +257,15 @@ const Chat = ({ friendId, userId }) => {
     });
     if (node) observer.current.observe(node);
   }, [loading, hasMore]);
-
+  
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      setMessages(prevMessages => [...prevMessages]);
+    }, 3000);
+  
+    return () => clearInterval(intervalId);
+  }, []);
+  
   const renderMessages = () => {
     let lastDate = null;
     let lastMessageSeen = null;
@@ -311,8 +338,19 @@ const Chat = ({ friendId, userId }) => {
       if (minutes > 0) {
         return minutes === 1 ? 'a minute ago' : `${minutes} minutes ago`;
       }
+      if (seconds < 16) {
+        return 'just now';
+      }
       return seconds === 1 ? 'a second ago' : `${seconds} seconds ago`;
     };
+
+    if (lastMessageSentByUser && lastMessageSentByUser.seen) {
+      lastMessageSeen = (
+        <div className="last-seen-status">
+          Seen {formatTimeSince(new Date(lastMessageSentByUser.seenAt))}
+        </div>
+      );
+    }
 
     if (lastMessageSentByUser && lastMessageSentByUser.seen) {
       lastMessageSeen = (
@@ -332,17 +370,20 @@ const Chat = ({ friendId, userId }) => {
 
   useEffect(() => {
     if (socket && messages.length > 0) {
-      socket.emit('messages_seen', { friendId });
+      const hasUnseenMessages = messages.some(msg => !msg.seen && msg.sender._id === friendId);
+      if (hasUnseenMessages) {
+        socket.emit('messages_seen', { friendId });
+      }
     }
-  }, [socket, messages, friendId]);
-
+  }, [socket, messages, friendId]);  
+  
   const handleInputChange = (e) => {
     setMessage(e.target.value);
-
+  
     if (!isTyping && e.target.value.trim()) {
       setIsTyping(true);
       socket.emit('typing', { friendId });
-
+  
       clearTimeout(typingTimeoutRef.current);
       typingTimeoutRef.current = setTimeout(() => {
         setIsTyping(false);
