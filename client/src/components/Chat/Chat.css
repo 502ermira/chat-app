@@ -120,5 +120,31 @@
   margin-left: auto;
 }
 
+.message-form input.disabled-input {
+  font-weight: bold;
+  background-color: #f5f5f5; 
+  font-size: 14px; 
+}
+
+.message-form input::placeholder {
+  color: #999;
+}
+
+.message-form input.disabled-input::placeholder {
+  font-size: 10.5px; 
+}
+.friendship-suggestion {
+  margin: 10px;
+  color: red; 
+}
+
+.friendship-suggestion p {
+  margin: 0;
+}
+
+.friendship-suggestion a {
+  color: blue;
+  text-decoration: underline;
+}
 
 

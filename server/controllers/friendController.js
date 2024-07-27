@@ -174,16 +174,33 @@ exports.getFriendRequestCount = async (req, res) => {
 
 exports.getFriendProfile = async (req, res) => {
   try {
-    const userId = req.params.id;
-    const user = await User.findById(userId).select('-password -friendRequests');
+    const userId = req.user.id;
+    const friendId = req.params.id;
+
+    const user = await User.findById(friendId).select('-password -friendRequests');
 
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    res.json(user);
+    const isFriend = await User.findOne({ _id: userId, friends: friendId });
+
+    res.json({ user, isFriend: !!isFriend });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server error' });
+  }
+};
+
+exports.removeFriend = async (req, res) => {
+  try {
+    const userId = req.user.id; 
+    const friendId = req.params.id; 
+ 
+    await User.findByIdAndUpdate(userId, { $pull: { friends: friendId } });
+    await User.findByIdAndUpdate(friendId, { $pull: { friends: userId } });
+    res.status(200).json({ message: 'Friend removed successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Error removing friend' });
   }
 };

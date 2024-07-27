@@ -10,6 +10,7 @@ const Chat = ({ friendId, userId }) => {
   const [messages, setMessages] = useState([]);
   const [image, setImage] = useState(null);
   const [friendUsername, setFriendUsername] = useState('');
+  const [isFriend, setIsFriend] = useState(false);
   const [modalImage, setModalImage] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -133,9 +134,25 @@ const Chat = ({ friendId, userId }) => {
     };
   }, [socket, friendId]);
   
-  
+    useEffect(() => {
+    const checkFriendStatus = async () => {
+      try {
+        const { data } = await API.get(`friends/friend/${friendId}`);
+        setIsFriend(data.isFriend);
+      } catch (error) {
+        console.error('Error checking friend status', error);
+      }
+    };
+
+    checkFriendStatus();
+  }, [friendId]);
+
   const handleSendMessage = (e) => {
     e.preventDefault();
+    if (!isFriend) {
+      alert('You cannot send messages to non-friends');
+      return;
+    }
     if ((message.trim() || image) && socket && socket.connected) {
       const formData = new FormData();
       formData.append('recipientId', friendId);
@@ -413,17 +430,24 @@ const Chat = ({ friendId, userId }) => {
       </ul>
       <form className="message-form" onSubmit={handleSendMessage}>
         <input
-          type="text"
-          value={message}
-          onChange={handleInputChange}
-          placeholder="Type a message..."
+         type="text"
+         value={message}
+         onChange={handleInputChange}
+         placeholder={isFriend ? "Type a message..." : "You cannot send messages to this user"}
+         disabled={!isFriend}
+         className={!isFriend ? "disabled-input" : ""}
         />
-        <label className="image-upload-label">
-          <input type="file" onChange={handleImageChange} />
-          Send Photo
-        </label>
-        <button type="submit">Send</button>
+       <label className="image-upload-label">
+       <input type="file" onChange={handleImageChange} disabled={!isFriend} />
+        Send Photo
+       </label>
+        <button type="submit" disabled={!isFriend}>Send</button>
       </form>
+        {!isFriend && (
+        <div className="friendship-suggestion">
+         <p>To send a message, you need to <Link to="/friends">become friends</Link>.</p>
+        </div>
+        )}
       {showModal && <ImageModal imageUrl={modalImage} onClose={closeModal} />}
     </div>
   );
