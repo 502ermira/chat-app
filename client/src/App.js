@@ -7,6 +7,7 @@ import FriendsPage from './pages/FriendsPage';
 import RequestsPage from './pages/RequestsPage';
 import RecentChatsPage from './pages/RecentChatsPage';
 import BottomNav from './BottomNav/BottomNav';
+import FriendInfo from './components/FriendInfo/FriendInfo.js';
 import { SocketProvider } from './contexts/SocketContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { FriendRequestProvider } from './contexts/FriendRequestContext';
@@ -32,6 +33,7 @@ const AppRoutes = () => {
         <Route path="/friends" element={user ? <FriendsPage /> : <Navigate to="/login" />} />
         <Route path="/requests" element={user ? <RequestsPage /> : <Navigate to="/login" />} />
         <Route path="/recent-chats" element={user ? <RecentChatsPage /> : <Navigate to="/login" />} />
+        <Route path="/friend/:id" element={user ? <FriendInfo /> : <Navigate to="/login" />} />
       </Routes>
       {!isChatPage && <BottomNav />}
       <Notification hideNotifications={hideNotifications} />

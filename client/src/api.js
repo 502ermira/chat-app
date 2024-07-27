@@ -1,10 +1,24 @@
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
 
 const API = axios.create({
   baseURL: 'http://localhost:5000/api',
 });
 
+// Request interceptor for adding the token to headers
+API.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Response interceptor for handling 401 errors
 API.interceptors.response.use(
   (response) => response,
   (error) => {

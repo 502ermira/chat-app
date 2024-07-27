@@ -159,6 +159,7 @@ exports.getUserById = async (req, res) => {
     res.status (500).json({ message: error.message });
   }
 };
+
 exports.getFriendRequestCount = async (req, res) => {
   try {
     const count = await FriendRequest.countDocuments({
@@ -168,5 +169,21 @@ exports.getFriendRequestCount = async (req, res) => {
     res.json({ count });
   } catch (error) {
     res.status(500).json({ message: error.message });
+  }
+};
+
+exports.getFriendProfile = async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const user = await User.findById(userId).select('-password -friendRequests');
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.json(user);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
   }
 };

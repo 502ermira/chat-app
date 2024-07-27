@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useSocket } from '../../contexts/SocketContext';
+import { Link } from 'react-router-dom';
 import API from '../../api';
 import ImageModal from '../ImageModal/ImageModal';
 import './Chat.css';
@@ -401,7 +402,9 @@ const Chat = ({ friendId, userId }) => {
   return (
     <div className="chat-container">
       <div className="chat-header">
-        <h2>{friendUsername}</h2>
+        <h2>
+          <Link to={`/friend/${friendId}`}>{friendUsername}</Link>
+        </h2>
         {friendTyping && <div className="typing-indicator">Typing...</div>}
       </div>
       <ul className="message-list">

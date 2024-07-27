@@ -1,5 +1,5 @@
 const express = require('express');
-const { sendFriendRequest, respondToFriendRequest, getFriends, getFriendRequests, searchUsers, getUserById, getFriendRequestCount } = require('../controllers/friendController');
+const { sendFriendRequest, respondToFriendRequest, getFriends, getFriendRequests, searchUsers, getUserById, getFriendRequestCount, getFriendProfile } = require('../controllers/friendController');
 const { protect } = require('../middleware/authMiddleware');
 
 const router = express.Router();
@@ -11,5 +11,6 @@ router.get('/requests', protect, getFriendRequests);
 router.get('/search', protect, searchUsers);
 router.get('/user/:id', protect, getUserById);
 router.get('/requests/count', protect, getFriendRequestCount);
+router.get('/friend/:id', protect, getFriendProfile);
 
 module.exports = router;
