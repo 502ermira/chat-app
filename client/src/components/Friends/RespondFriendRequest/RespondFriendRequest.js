@@ -59,12 +59,14 @@ const RespondFriendRequest = () => {
     if (socket) {
       socket.on('friend-request-received', fetchRequests);
       socket.on('friend-request-responded', fetchRequests);
+      socket.on('friend-request-cancelled', fetchRequests);
     }
 
     return () => {
       if (socket) {
         socket.off('friend-request-received', fetchRequests);
         socket.off('friend-request-responded', fetchRequests);
+        socket.on('friend-request-cancelled', fetchRequests);
       }
     };
   }, [socket, user.id]);

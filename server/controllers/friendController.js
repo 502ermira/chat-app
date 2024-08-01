@@ -220,10 +220,16 @@ exports.cancelFriendRequest = async (req, res) => {
       return res.status(403).json({ message: 'You are not authorized to cancel this request' });
     }
 
+    const recipientId = friendRequest.recipient.equals(userId) ? friendRequest.requester : friendRequest.recipient;
+
     await friendRequest.deleteOne();
+
+    req.io.to(userId.toString()).emit('friend-request-cancelled', { requestId });
+    req.io.to(recipientId.toString()).emit('friend-request-cancelled', { requestId });
 
     res.status(200).json({ message: 'Friend request canceled' });
   } catch (error) {
     res.status(500).json({ message: 'Internal server error' });
   }
 };
+

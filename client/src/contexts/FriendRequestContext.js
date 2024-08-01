@@ -45,12 +45,19 @@ export const FriendRequestProvider = ({ children }) => {
         fetchFriendRequestCount();
       };
 
+      const handleFriendRequestCancelled = () => {
+        setFriendRequestCount((prevCount) => prevCount - 1);
+        fetchFriendRequestCount();
+      };
+
       socket.on('friend-request-received', handleFriendRequestReceived);
       socket.on('friend-request-responded', handleFriendRequestResponded);
+      socket.on('friend-request-cancelled', handleFriendRequestCancelled);
 
       return () => {
         socket.off('friend-request-received', handleFriendRequestReceived);
         socket.off('friend-request-responded', handleFriendRequestResponded);
+        socket.off('friend-request-cancelled', handleFriendRequestCancelled);
       };
     }
   }, [socket, fetchFriendRequestCount, addNotification]);
