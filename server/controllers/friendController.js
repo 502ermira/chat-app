@@ -204,3 +204,26 @@ exports.removeFriend = async (req, res) => {
     res.status(500).json({ message: 'Error removing friend' });
   }
 };
+
+exports.cancelFriendRequest = async (req, res) => {
+  const { requestId } = req.body;
+  const userId = req.user._id;
+
+  try {
+    const friendRequest = await FriendRequest.findById(requestId);
+
+    if (!friendRequest) {
+      return res.status(404).json({ message: 'Friend request not found' });
+    }
+
+    if (!friendRequest.requester.equals(userId) && !friendRequest.recipient.equals(userId)) {
+      return res.status(403).json({ message: 'You are not authorized to cancel this request' });
+    }
+
+    await friendRequest.deleteOne();
+
+    res.status(200).json({ message: 'Friend request canceled' });
+  } catch (error) {
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};

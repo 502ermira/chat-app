@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import API from '../../../api';
 import debounce from 'lodash.debounce';
@@ -13,34 +13,34 @@ const SendFriendRequest = () => {
   const [filteredUsers, setFilteredUsers] = useState([]);
   const navigate = useNavigate();
 
+  const fetchPendingRequests = useCallback(async () => {
+    const token = localStorage.getItem('token');
+    try {
+      const { data } = await API.get('/friends/requests', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setPendingRequests(data);
+    } catch (error) {
+      console.error('Error fetching friend requests:', error);
+    }
+  }, []);
+
+  const fetchUserFriends = useCallback(async () => {
+    const token = localStorage.getItem('token');
+    try {
+      const { data } = await API.get('/friends', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setUserFriends(data);
+    } catch (error) {
+      console.error('Error fetching user friends:', error);
+    }
+  }, []);
+
   useEffect(() => {
-    const fetchPendingRequests = async () => {
-      const token = localStorage.getItem('token');
-      try {
-        const { data } = await API.get('/friends/requests', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setPendingRequests(data);
-      } catch (error) {
-        console.error('Error fetching friend requests:', error);
-      }
-    };
-
-    const fetchUserFriends = async () => {
-      const token = localStorage.getItem('token');
-      try {
-        const { data } = await API.get('/friends', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setUserFriends(data);
-      } catch (error) {
-        console.error('Error fetching user friends:', error);
-      }
-    };
-
     fetchPendingRequests();
     fetchUserFriends();
-  }, []);
+  }, [fetchPendingRequests, fetchUserFriends]);
 
   const fetchUsers = debounce(async (searchUsername) => {
     if (searchUsername.trim() === '') {
@@ -73,8 +73,22 @@ const SendFriendRequest = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
       setMessage(`Friend request sent to ${recipientUsername}`);
+      fetchPendingRequests();
     } catch (error) {
       setMessage(error.response.data.message || 'Error sending friend request');
+    }
+  };
+
+  const handleCancelRequest = async (requestId) => {
+    const token = localStorage.getItem('token');
+    try {
+      const { data } = await API.post('/friends/cancel', { requestId }, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setMessage(`Friend request canceled`);
+      fetchPendingRequests();
+    } catch (error) {
+      setMessage(error.response.data.message || 'Error canceling friend request');
     }
   };
 
@@ -85,7 +99,7 @@ const SendFriendRequest = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
       setMessage(`Friend request ${status}`);
-      setPendingRequests(pendingRequests.filter(request => request._id !== requestId));
+      fetchPendingRequests();
     } catch (error) {
       setMessage(error.response.data.message || `Error ${status} friend request`);
     }
@@ -109,16 +123,13 @@ const SendFriendRequest = () => {
     const isFriend = userFriends.some(friend => friend._id === user._id);
 
     if (isFriend) {
-      return <span>&nbsp;-Friends</span>;
+      return <span>&nbsp;- Friends</span>;
     } else {
-      const pendingRequest = pendingRequests.find(request => request.requester.username === user.username);
+      const pendingRequest = pendingRequests.find(request => request.recipient.username === user.username && request.status === 'pending');
 
       if (pendingRequest) {
         return (
-          <span>
-            <button onClick={() => handleRespond(pendingRequest._id, 'accepted')}>Accept</button>
-            <button onClick={() => handleRespond(pendingRequest._id, 'declined')}>Decline</button>
-          </span>
+          <button onClick={() => handleCancelRequest(pendingRequest._id)}>Requested</button>
         );
       } else {
         return <button onClick={() => handleAddFriend(user.username)}>Add</button>;
