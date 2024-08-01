@@ -63,8 +63,7 @@ const Chat = ({ friendId, userId }) => {
       }
     };
     fetchMessages();
-  }, [friendId, socket]);
-  
+  }, [friendId, socket]);  
 
   useEffect(() => {
     if (messagesEndRef.current) {
@@ -174,11 +173,14 @@ const Chat = ({ friendId, userId }) => {
             seenAt: null,
           };
   
-          console.log('Emitting send_message event with message:', newMessage);
           socket.emit('send_message', Object.fromEntries(formData));
           setMessages((prevMessages) => [...prevMessages, newMessage]);
           setMessage('');
           setImage(null);
+  
+          if (messagesEndRef.current) {
+            messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+          }
         };
         reader.readAsDataURL(image);
       } else {
@@ -189,18 +191,22 @@ const Chat = ({ friendId, userId }) => {
           seen: false,
           seenAt: null,
         };
-
+  
         socket.emit('send_message', Object.fromEntries(formData));
         setMessages((prevMessages) => [...prevMessages, newMessage]);
         setMessage('');
+  
+        if (messagesEndRef.current) {
+          messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
       }
-
+  
       if (isTyping) {
         socket.emit('stop_typing', { friendId });
         setIsTyping(false);
       }
     }
-  };
+  };  
 
   const handleImageChange = (e) => {
     setImage(e.target.files[0]);
