@@ -5,6 +5,7 @@
   -ms-overflow-style: none; 
   display: flex;
   flex-direction: column;
+  background: linear-gradient(135deg, #13221d, #183832);
 }
 
 .chat-container::-webkit-scrollbar {
@@ -12,10 +13,52 @@
 }
 
 .chat-header {
-  background-color: #f5f5f5;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   padding: 10px;
-  text-align: center;
-  border-bottom: 1px solid #ddd;
+  background-color: rgba(2, 22, 20);
+}
+
+.chat-header-left {
+  display: flex;
+  align-items: center;
+  margin-left:-47%;
+  color: #ddd;
+}
+
+.chat-header-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.7rem;
+  color:#aaa;
+  margin-right: 5px;
+}
+
+.profile-button:hover {
+  color: #05312f;
+}
+
+.chat-profile-picture{
+  border-radius: 50%;
+  height:40px;
+  margin-right:7px;
+}
+
+.back-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.5rem;
+  margin-top:5px;
+  color:#aaa;
+  margin-left: 5px;
 }
 
 .message-list {
@@ -24,6 +67,8 @@
   flex-direction: column;
   padding: 10px;
   overflow-y: auto;
+  color:#ccc;
+  font-size: 15px;
 }
 
 .message {
@@ -33,24 +78,32 @@
   max-width: 60%;
   word-wrap: break-word;
   display: inline-block;
+  position: relative;
 }
 
 .sent {
-  background-color: #dcf8c6;
+  background-color: #111f1bf3;
   align-self: flex-end;
   text-align: right;
 }
 
 .received {
-  background-color: #f1f0f0;
+  background-color: #33413e;
   align-self: flex-start;
   text-align: left;
 }
 
 .timestamp {
   display: block;
-  font-size: 0.8em;
-  color: gray;
+  font-size: 0.7em;
+  color: #aaa;
+  margin-top: 2px;
+}
+
+.seen-checkmark {
+  margin-left: 1px;
+  margin-bottom: -2px;
+  font-size: 1.3em;
 }
 
 .message-image {
@@ -62,27 +115,32 @@
 .date-separator {
   text-align: center;
   margin: 10px 0;
-  font-weight: bold;
+  font-size: 13px;
 }
 
 .message-form {
   display: flex;
   align-items: center;
   padding: 10px;
-  border-top: 1px solid #ddd;
+  background-color: rgba(2, 22, 20);
 }
 
 .message-form input[type="text"] {
   flex: 1;
   padding: 10px;
-  border: 1px solid #ddd;
+  border: none;
   border-radius: 5px;
   margin-right: 10px;
+  background-color:#204841;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.5);
+  color: white;
 }
 
 .image-upload-label {
   margin-right: 10px;
   cursor: pointer;
+  font-size: 22px;
+  color: #ccc;
 }
 
 .image-upload-label input[type="file"] {
@@ -90,32 +148,24 @@
 }
 
 .message-form button {
-  padding: 10px 20px;
-  background-color: #4caf50;
-  color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  font-size: 22px;
+  background: none;
+  margin-right: 3px;
+  color: #ccc;
 }
 
-.message-form button:hover {
-  background-color: #45a049;
-}
 .message-form button:disabled {
   background-color: #ccc;
   cursor: not-allowed;
 }
 
-.seen-status {
-  font-size: 0.8em;
-  color: #4caf50;
-  margin-left: 10px;
-}
-
 .last-seen-status {
   text-align: left;
-  color: gray;
-  font-size: 12px;
+  color: #ddd;
+  font-size: 11px;
   margin-right: 0;
   margin-left: auto;
 }
@@ -127,7 +177,7 @@
 }
 
 .message-form input::placeholder {
-  color: #999;
+  color: #ccc;
 }
 
 .message-form input.disabled-input::placeholder {

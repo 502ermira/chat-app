@@ -1,15 +1,23 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useSocket } from '../../contexts/SocketContext';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import API from '../../api';
 import ImageModal from '../ImageModal/ImageModal';
 import './Chat.css';
+import { GoArrowLeft } from "react-icons/go";
+import { MdOutlineManageAccounts } from "react-icons/md";
+import { IoCheckmarkDone } from "react-icons/io5";
+import { TbPhoto } from "react-icons/tb";
+import { BsSend } from "react-icons/bs";
 
 const Chat = ({ friendId, userId }) => {
+  const navigate = useNavigate();
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState([]);
   const [image, setImage] = useState(null);
   const [friendUsername, setFriendUsername] = useState('');
+  const [friendFullName, setFriendFullName] = useState('');
+  const [friendProfilePicture, setFriendProfilePicture] = useState('');
   const [isFriend, setIsFriend] = useState(false);
   const [modalImage, setModalImage] = useState(null);
   const [showModal, setShowModal] = useState(false);
@@ -30,6 +38,8 @@ const Chat = ({ friendId, userId }) => {
           headers: { Authorization: `Bearer ${token}` },
         });
         setFriendUsername(data.username);
+        setFriendFullName(data.fullName);
+        setFriendProfilePicture(data.profilePicture);
       } catch (error) {
         console.error('Error fetching friend username:', error);
       }
@@ -311,24 +321,22 @@ const Chat = ({ friendId, userId }) => {
 
       return (
         <React.Fragment key={msg._id || index}>
-          {showDate && <div className="date-separator" key={`date-${index}`}>{currentDate}</div>}
-          <li className={`message ${isSentMessage ? 'sent' : 'received'}`} ref={ref} key={`msg-${index}`}>
-            {msg.message} <span className="timestamp">{formatTime(new Date(msg.timestamp))}</span>
-            {msg.image && (
-              <img
-                src={msg.imagePath || msg.image}
-                alt="Sent"
-                className="message-image"
-                onClick={() => openModal(msg.imagePath || msg.image)}
-              />
-            )}
-            {isSentMessage && msg.seen && (
-              <span className="seen-status">
-                Seen at {formatTime(new Date(msg.seenAt))}
-              </span>
-            )}
-          </li>
-        </React.Fragment>
+        {showDate && <div className="date-separator" key={`date-${index}`}>{currentDate}</div>}
+        <li className={`message ${isSentMessage ? 'sent' : 'received'}`} ref={ref} key={`msg-${index}`}>
+          {msg.message} <span className="timestamp">
+            {formatTime(new Date(msg.timestamp))}
+            {isSentMessage && msg.seen && <IoCheckmarkDone className="seen-checkmark" />}
+          </span>
+          {msg.image && (
+            <img
+              src={msg.imagePath || msg.image}
+              alt="Sent"
+              className="message-image"
+              onClick={() => openModal(msg.imagePath || msg.image)}
+            />
+          )}
+        </li>
+      </React.Fragment>
       );
     });
 
@@ -367,14 +375,6 @@ const Chat = ({ friendId, userId }) => {
       }
       return seconds === 1 ? 'a second ago' : `${seconds} seconds ago`;
     };
-
-    if (lastMessageSentByUser && lastMessageSentByUser.seen) {
-      lastMessageSeen = (
-        <div className="last-seen-status">
-          Seen {formatTimeSince(new Date(lastMessageSentByUser.seenAt))}
-        </div>
-      );
-    }
 
     if (lastMessageSentByUser && lastMessageSentByUser.seen) {
       lastMessageSeen = (
@@ -425,9 +425,23 @@ const Chat = ({ friendId, userId }) => {
   return (
     <div className="chat-container">
       <div className="chat-header">
-        <h2>
-          <Link to={`/friend/${friendId}`}>{friendUsername}</Link>
-        </h2>
+        <button className="back-button" onClick={() => navigate(-1)}>
+          <GoArrowLeft />
+        </button>
+        <div className="chat-header-left">
+          <img
+            src={friendProfilePicture || 'https://i0.wp.com/www.repol.copl.ulaval.ca/wp-content/uploads/2019/01/default-user-icon.jpg?ssl=1'}
+            alt="Profile"
+            className="chat-profile-picture"
+          />
+          <div className="chat-header-info">
+            <p className="friend-fullname">{friendFullName}</p>
+            <p className="friend-username">@{friendUsername}</p>
+          </div>
+        </div>
+        <button className="profile-button" onClick={() => navigate(`/friend/${friendId}`)}>
+          <MdOutlineManageAccounts />
+        </button>
         {friendTyping && <div className="typing-indicator">Typing...</div>}
       </div>
       <ul className="message-list">
@@ -436,24 +450,24 @@ const Chat = ({ friendId, userId }) => {
       </ul>
       <form className="message-form" onSubmit={handleSendMessage}>
         <input
-         type="text"
-         value={message}
-         onChange={handleInputChange}
-         placeholder={isFriend ? "Type a message..." : "You cannot send messages to this user"}
-         disabled={!isFriend}
-         className={!isFriend ? "disabled-input" : ""}
+          type="text"
+          value={message}
+          onChange={handleInputChange}
+          placeholder={isFriend ? "Type a message..." : "You cannot send messages to this user"}
+          disabled={!isFriend}
+          className={!isFriend ? "disabled-input" : ""}
         />
-       <label className="image-upload-label">
-       <input type="file" onChange={handleImageChange} disabled={!isFriend} />
-        Send Photo
-       </label>
-        <button type="submit" disabled={!isFriend}>Send</button>
+        <label className="image-upload-label">
+          <input type="file" onChange={handleImageChange} disabled={!isFriend} />
+          <TbPhoto />
+        </label>
+        <button type="submit" disabled={!isFriend}><BsSend /></button>
       </form>
-        {!isFriend && (
+      {!isFriend && (
         <div className="friendship-suggestion">
-         <p>To send a message, you need to <Link to="/friends">become friends</Link>.</p>
+          <p>To send a message, you need to <Link to="/friends">become friends</Link>.</p>
         </div>
-        )}
+      )}
       {showModal && <ImageModal imageUrl={modalImage} onClose={closeModal} />}
     </div>
   );
