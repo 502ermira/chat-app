@@ -29,7 +29,8 @@ const RecentChats = () => {
             Authorization: `Bearer ${token}`,
           },
         });
-        setRecentChats(response.data);
+        const sortedChats = response.data.sort((a, b) => new Date(b.lastMessage.timestamp) - new Date(a.lastMessage.timestamp));
+        setRecentChats(sortedChats);
         setLoading(false);
       } catch (error) {
         console.error('Error fetching recent chats:', error);
@@ -68,7 +69,8 @@ const RecentChats = () => {
             });
           }
 
-          return updatedChats;
+          const sortedChats = updatedChats.sort((a, b) => new Date(b.lastMessage.timestamp) - new Date(a.lastMessage.timestamp));
+          return sortedChats;
         });
         fetchUnseenMessagesCount();
       };
