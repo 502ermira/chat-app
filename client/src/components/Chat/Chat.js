@@ -9,6 +9,7 @@ import { MdOutlineManageAccounts } from "react-icons/md";
 import { IoCheckmarkDone } from "react-icons/io5";
 import { TbPhoto } from "react-icons/tb";
 import { BsSend } from "react-icons/bs";
+import {  useUnseenMessages } from '../../contexts/UnseenMessagesContext';
 
 const Chat = ({ friendId, userId }) => {
   const navigate = useNavigate();
@@ -29,6 +30,7 @@ const Chat = ({ friendId, userId }) => {
   const messagesEndRef = useRef(null);
   const observer = useRef();
   const typingTimeoutRef = useRef(null);
+  const { fetchUnseenMessagesCount } = useUnseenMessages();
 
   useEffect(() => {
     const fetchFriendUsername = async () => {
@@ -268,7 +270,6 @@ const Chat = ({ friendId, userId }) => {
         timestamp: new Date(msg.timestamp),
         seenAt: msg.seenAt ? new Date(msg.seenAt) : null,
       }));
-      console.log('Fetched more messages:', moreMessages);
       setMessages((prevMessages) => [
         ...moreMessages,
         ...prevMessages
@@ -397,9 +398,10 @@ const Chat = ({ friendId, userId }) => {
       const hasUnseenMessages = messages.some(msg => !msg.seen && msg.sender._id === friendId);
       if (hasUnseenMessages) {
         socket.emit('messages_seen', { friendId });
+        fetchUnseenMessagesCount();
       }
     }
-  }, [socket, messages, friendId]);  
+  }, [socket, messages, friendId]);
   
   const handleInputChange = (e) => {
     setMessage(e.target.value);
