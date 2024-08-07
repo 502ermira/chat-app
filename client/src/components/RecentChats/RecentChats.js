@@ -5,6 +5,7 @@ import API from '../../api';
 import { useSocket } from '../../contexts/SocketContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { useUnseenMessages } from '../../contexts/UnseenMessagesContext';
+import { AiOutlinePaperClip } from 'react-icons/ai';
 
 const RecentChats = () => {
   const { user } = useAuth();
@@ -140,9 +141,24 @@ const RecentChats = () => {
   };
 
   const truncateMessage = (message, maxLength) => {
-    if (message.length <= maxLength) return message;
-    return message.slice(0, maxLength) + '...';
-  };  
+    if (typeof message === 'string' && message.length > maxLength) {
+      return message.slice(0, maxLength) + '...';
+    }
+    return message;
+  };
+
+  const renderMessageContent = (message) => {
+    if (!message) {
+      return 'No message';
+    } else if (typeof message.message === 'string') {
+      return truncateMessage(message.message, 35);
+    }
+    return (
+      <>
+        <AiOutlinePaperClip /> Attachment
+      </>
+    );
+  };
 
   return (
     <div className="recent-chats-container">
@@ -167,7 +183,7 @@ const RecentChats = () => {
                       ) : (
                         <>
                           {chat.lastMessage && isMeSender(chat.lastMessage.sender._id) ? 'Me: ' : ''}
-                          {chat.lastMessage ? truncateMessage(chat.lastMessage.message, 35) : 'No messages yet'}
+                          {chat.lastMessage ? renderMessageContent(chat.lastMessage) : 'No messages yet'}
                         </>
                       )}
                     </p>

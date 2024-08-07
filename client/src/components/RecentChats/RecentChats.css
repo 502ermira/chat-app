@@ -49,6 +49,11 @@
   white-space: normal;
 }
 
+.recent-chat-message svg{
+  margin-bottom: -2px;
+  margin-right: -2px;
+}
+
 .recent-chat-unseen {
   background-color: #d9f9d9;
 }
