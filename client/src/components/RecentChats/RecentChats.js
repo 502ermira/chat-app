@@ -139,6 +139,11 @@ const RecentChats = () => {
     return user && senderId === user.id;
   };
 
+  const truncateMessage = (message, maxLength) => {
+    if (message.length <= maxLength) return message;
+    return message.slice(0, maxLength) + '...';
+  };  
+
   return (
     <div className="recent-chats-container">
       {loading ? (
@@ -162,7 +167,7 @@ const RecentChats = () => {
                       ) : (
                         <>
                           {chat.lastMessage && isMeSender(chat.lastMessage.sender._id) ? 'Me: ' : ''}
-                          {chat.lastMessage ? chat.lastMessage.message : 'No messages yet'}
+                          {chat.lastMessage ? truncateMessage(chat.lastMessage.message, 35) : 'No messages yet'}
                         </>
                       )}
                     </p>

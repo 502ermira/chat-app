@@ -43,6 +43,10 @@
 
 .recent-chat-message {
   margin-top: 0px;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
+  white-space: normal;
 }
 
 .recent-chat-unseen {

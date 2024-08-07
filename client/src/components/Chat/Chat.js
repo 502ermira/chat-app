@@ -9,7 +9,8 @@ import { MdOutlineManageAccounts } from "react-icons/md";
 import { IoCheckmarkDone } from "react-icons/io5";
 import { TbPhoto } from "react-icons/tb";
 import { BsSend } from "react-icons/bs";
-import {  useUnseenMessages } from '../../contexts/UnseenMessagesContext';
+import { useUnseenMessages } from '../../contexts/UnseenMessagesContext';
+import CustomAlert from '../CustomAlert/CustomAlert';
 
 const Chat = ({ friendId, userId }) => {
   const navigate = useNavigate();
@@ -26,11 +27,14 @@ const Chat = ({ friendId, userId }) => {
   const [hasMore, setHasMore] = useState(true);
   const [isTyping, setIsTyping] = useState(false);
   const [friendTyping, setFriendTyping] = useState(false);
+  const [alertMessage, setAlertMessage] = useState(null);
   const socket = useSocket();
   const messagesEndRef = useRef(null);
   const observer = useRef();
   const typingTimeoutRef = useRef(null);
   const { fetchUnseenMessagesCount } = useUnseenMessages();
+  const MESSAGE_CHAR_LIMIT = 3100;
+  
 
   useEffect(() => {
     const fetchFriendUsername = async () => {
@@ -164,6 +168,10 @@ const Chat = ({ friendId, userId }) => {
       alert('You cannot send messages to non-friends');
       return;
     }
+    if (message.length > MESSAGE_CHAR_LIMIT) {
+      setAlertMessage(`Message is too long!`);
+      return;
+    }
     if ((message.trim() || image) && socket && socket.connected) {
       const formData = new FormData();
       formData.append('recipientId', friendId);
@@ -218,7 +226,11 @@ const Chat = ({ friendId, userId }) => {
         setIsTyping(false);
       }
     }
-  };  
+  };   
+
+  const closeAlert = () => {
+    setAlertMessage(null);
+  };
 
   const handleImageChange = (e) => {
     setImage(e.target.files[0]);
@@ -296,7 +308,7 @@ const Chat = ({ friendId, userId }) => {
   useEffect(() => {
     const intervalId = setInterval(() => {
       setMessages(prevMessages => [...prevMessages]);
-    }, 3000);
+    }, 30000);
   
     return () => clearInterval(intervalId);
   }, []);
@@ -402,27 +414,40 @@ const Chat = ({ friendId, userId }) => {
       }
     }
   }, [socket, messages, friendId]);
+
+  const handlePaste = (e) => {
+    const pasteData = e.clipboardData.getData('text');
+    const currentMessage = e.target.value;
+    const combinedLength = currentMessage.length + pasteData.length;
+    if (combinedLength > MESSAGE_CHAR_LIMIT) {
+      e.preventDefault();
+      setAlertMessage(`Your message is too long. Please try a shorter message.`);
+    }
+  };  
   
   const handleInputChange = (e) => {
-    setMessage(e.target.value);
+    const inputValue = e.target.value;
+    if (inputValue.length <= MESSAGE_CHAR_LIMIT) {
+      setMessage(inputValue);
   
-    if (!isTyping && e.target.value.trim()) {
-      setIsTyping(true);
-      socket.emit('typing', { friendId });
+      if (!isTyping && inputValue.trim()) {
+        setIsTyping(true);
+        socket.emit('typing', { friendId });
   
-      clearTimeout(typingTimeoutRef.current);
-      typingTimeoutRef.current = setTimeout(() => {
-        setIsTyping(false);
-        socket.emit('stop_typing', { friendId });
-      }, 3000);
-    } else {
-      clearTimeout(typingTimeoutRef.current);
-      typingTimeoutRef.current = setTimeout(() => {
-        setIsTyping(false);
-        socket.emit('stop_typing', { friendId });
-      }, 3000);
+        clearTimeout(typingTimeoutRef.current);
+        typingTimeoutRef.current = setTimeout(() => {
+          setIsTyping(false);
+          socket.emit('stop_typing', { friendId });
+        }, 3000);
+      } else {
+        clearTimeout(typingTimeoutRef.current);
+        typingTimeoutRef.current = setTimeout(() => {
+          setIsTyping(false);
+          socket.emit('stop_typing', { friendId });
+        }, 3000);
+      }
     }
-  };
+  };  
 
   return (
     <div className="chat-container">
@@ -455,6 +480,7 @@ const Chat = ({ friendId, userId }) => {
           type="text"
           value={message}
           onChange={handleInputChange}
+          onPaste={handlePaste}
           placeholder={isFriend ? "Type a message..." : "You cannot send messages to this user"}
           disabled={!isFriend}
           className={!isFriend ? "disabled-input" : ""}
@@ -471,6 +497,7 @@ const Chat = ({ friendId, userId }) => {
         </div>
       )}
       {showModal && <ImageModal imageUrl={modalImage} onClose={closeModal} />}
+      {alertMessage && <CustomAlert message={alertMessage} onClose={closeAlert} />}
     </div>
   );
 };
