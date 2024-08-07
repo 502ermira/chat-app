@@ -491,6 +491,7 @@ const Chat = ({ friendId, userId }) => {
             src={friendProfilePicture || 'https://i0.wp.com/www.repol.copl.ulaval.ca/wp-content/uploads/2019/01/default-user-icon.jpg?ssl=1'}
             alt="Profile"
             className="chat-profile-picture"
+            onClick={() => openModal(friendProfilePicture || 'https://i0.wp.com/www.repol.copl.ulaval.ca/wp-content/uploads/2019/01/default-user-icon.jpg?ssl=1')}
           />
           <div className="chat-header-info">
             <p className="friend-fullname">{friendFullName}</p>

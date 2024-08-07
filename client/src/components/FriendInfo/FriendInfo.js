@@ -6,6 +6,7 @@ import { FaRegUser } from "react-icons/fa";
 import { AiOutlineMail } from "react-icons/ai";
 import { PiCalendarDotsDuotone } from "react-icons/pi";
 import { GiFemale, GiMale } from "react-icons/gi";
+import ImageModal from '../ImageModal/ImageModal';
 
 const FriendInfo = () => {
   const { id } = useParams();
@@ -15,6 +16,8 @@ const FriendInfo = () => {
   const [error, setError] = useState(null);
   const [message, setMessage] = useState('');
   const [isFriend, setIsFriend] = useState(false);
+  const [modalImage, setModalImage] = useState(null);
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     const fetchFriend = async () => {
@@ -49,6 +52,16 @@ const FriendInfo = () => {
 
   if (!isFriend) return <div>You are not friends with this user.</div>;
 
+  const openModal = (imageUrl) => {
+    setModalImage(imageUrl);
+    setShowModal(true);
+  };
+
+  const closeModal = () => {
+    setModalImage(null);
+    setShowModal(false);
+  };
+
   return (
     <div className="user-profile">
       <div className="profile-view">
@@ -57,6 +70,7 @@ const FriendInfo = () => {
             src={friend.profilePicture || 'https://i0.wp.com/www.repol.copl.ulaval.ca/wp-content/uploads/2019/01/default-user-icon.jpg?ssl=1'}
             alt="Profile"
             className="profile-picture"
+            onClick={() => openModal(friend.profilePicture || 'https://i0.wp.com/www.repol.copl.ulaval.ca/wp-content/uploads/2019/01/default-user-icon.jpg?ssl=1')}
           />
           <h2 className="profile-name">{friend.fullName}</h2>
           <button className="remove-friend-button" onClick={handleRemoveFriend}>
@@ -75,6 +89,7 @@ const FriendInfo = () => {
           <p className="info-item"><span className="info-label"><AiOutlineMail /></span> {friend.email}</p>
         </div>
         {message && <p className="success-message">{message}</p>}
+        {showModal && <ImageModal imageUrl={modalImage} onClose={closeModal} />}
       </div>
     </div>
   );
