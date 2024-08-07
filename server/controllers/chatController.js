@@ -71,7 +71,7 @@ exports.getRecentChats = async (req, res) => {
       {
         $project: {
           _id: 0,
-          friend: { _id: 1, username: 1 },
+          friend: { _id: 1, fullName: 1, profilePicture: 1 },
           lastMessage: {
             sender: { _id: "$senderInfo._id", username: "$senderInfo.username" },
             recipient: { _id: "$recipientInfo._id", username: "$recipientInfo.username" },

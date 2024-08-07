@@ -173,21 +173,28 @@ const RecentChats = () => {
               {recentChats.map((chat, index) => (
                 <Link key={index} to={`/chat/${chat.friend._id}`} className="recent-chat-link">
                   <div className={`recent-chat-item ${chat.unopenedCount > 0 ? 'recent-chat-unseen' : ''}`}>
-                    <div className="recent-chat-header">
-                      <p className="recent-chat-username">{chat.friend && chat.friend.username ? chat.friend.username : 'Unknown user'}</p>
-                      <p className="recent-chat-timestamp">{chat.lastMessage ? formatDate(chat.lastMessage.timestamp) : ''}</p>
+                    <div className="recent-chat-item-container">
+                      <div className="recent-chat-avatar">
+                        <img src={chat.friend.profilePicture || 'https://i0.wp.com/www.repol.copl.ulaval.ca/wp-content/uploads/2019/01/default-user-icon.jpg?ssl=1'} alt="Profile" />
+                      </div>
+                      <div className="recent-chat-item-content">
+                        <div className="recent-chat-header">
+                          <p className="recent-chat-fullname">{chat.friend && chat.friend.fullName ? chat.friend.fullName : 'Unknown user'}</p>
+                          <p className="recent-chat-timestamp">{chat.lastMessage ? formatDate(chat.lastMessage.timestamp) : ''}</p>
+                        </div>
+                        <p className="recent-chat-message">
+                          {typingIndicators[chat.friend._id] ? (
+                            <em>Typing...</em>
+                          ) : (
+                            <>
+                              {chat.lastMessage && isMeSender(chat.lastMessage.sender._id) ? 'Me: ' : ''}
+                              {chat.lastMessage ? renderMessageContent(chat.lastMessage) : 'No messages yet'}
+                            </>
+                          )}
+                        </p>
+                        {chat.unopenedCount > 0 && <span className="unopened-count">{chat.unopenedCount}</span>}
+                      </div>
                     </div>
-                    <p className="recent-chat-message">
-                      {typingIndicators[chat.friend._id] ? (
-                        <em>Typing...</em>
-                      ) : (
-                        <>
-                          {chat.lastMessage && isMeSender(chat.lastMessage.sender._id) ? 'Me: ' : ''}
-                          {chat.lastMessage ? renderMessageContent(chat.lastMessage) : 'No messages yet'}
-                        </>
-                      )}
-                    </p>
-                    {chat.unopenedCount > 0 && <span className="unopened-count">{chat.unopenedCount}</span>}
                   </div>
                 </Link>
               ))}

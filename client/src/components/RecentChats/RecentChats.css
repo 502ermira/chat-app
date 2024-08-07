@@ -15,10 +15,15 @@
 
 .recent-chat-item {
   background-color: #f5f5f5;
-  padding: 0px 15px 10px 15px;
+  padding: 10px 13px 10px 13px;
   cursor: pointer;
   transition: background-color 0.3s ease;
   position: relative;
+}
+
+.recent-chat-item-container {
+  display: flex;
+  align-items: center;
 }
 
 .recent-chat-item:hover {
@@ -29,11 +34,27 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-top: -3px;
+  font-size: 17px;
 }
 
-.recent-chat-username {
+.recent-chat-fullname {
   font-weight: bold;
   margin-right: 10px;
+}
+
+.recent-chat-avatar {
+  margin-right: 8px;
+}
+
+.recent-chat-item-content {
+  flex: 1;
+}
+
+.recent-chat-avatar img {
+  width: 47px; 
+  height: 47px; 
+  border-radius: 50%;
 }
 
 .recent-chat-timestamp {
@@ -61,11 +82,11 @@
 
 .unopened-count {
   position: absolute;
-  top: 10px;
-  right: 15px;
-  background-color: red;
+  top: 35px;
+  right: 16px;
+  background-color: rgb(20, 167, 25);
   color: white;
   border-radius: 50%;
-  padding: 2px 8px;
+  padding: 1px 6px;
   font-size: 0.8em;
 }

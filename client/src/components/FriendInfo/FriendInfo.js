@@ -7,6 +7,7 @@ import { AiOutlineMail } from "react-icons/ai";
 import { PiCalendarDotsDuotone } from "react-icons/pi";
 import { GiFemale, GiMale } from "react-icons/gi";
 import ImageModal from '../ImageModal/ImageModal';
+import { GoArrowLeft } from 'react-icons/go';
 
 const FriendInfo = () => {
   const { id } = useParams();
@@ -64,6 +65,9 @@ const FriendInfo = () => {
 
   return (
     <div className="user-profile">
+        <button className="back-button" onClick={() => navigate(-1)}>
+          <GoArrowLeft />
+        </button>
       <div className="profile-view">
         <div className="profile-header">
           <img
