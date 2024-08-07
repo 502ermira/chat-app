@@ -33,7 +33,8 @@ const RespondFriendRequest = () => {
     } else if (diff < 7 * oneDay) {
       return new Date(date).toLocaleDateString('en-US', { weekday: 'long' });
     } else {
-      return new Date(date).toLocaleDateString();
+      const d = new Date(date);
+      return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
     }
   };
 
@@ -66,7 +67,7 @@ const RespondFriendRequest = () => {
       if (socket) {
         socket.off('friend-request-received', fetchRequests);
         socket.off('friend-request-responded', fetchRequests);
-        socket.on('friend-request-cancelled', fetchRequests);
+        socket.off('friend-request-cancelled', fetchRequests);
       }
     };
   }, [socket, user.id]);
@@ -74,7 +75,7 @@ const RespondFriendRequest = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       setRequests(requests => [...requests]);
-    }, 60000);
+    }, 6000);
 
     return () => clearInterval(interval);
   }, []);
@@ -222,7 +223,7 @@ const RespondFriendRequest = () => {
           </div>
         )
       ))}
-      {message && <div className="error-message">{message}</div>}
+      {message && <p className="error-message">{message}</p>}
     </div>
   );
 };

@@ -122,8 +122,17 @@ const RecentChats = () => {
   const formatDate = (timestamp) => {
     const date = new Date(timestamp);
     const now = new Date();
-    const isToday = date.toDateString() === now.toDateString();
-    return isToday ? date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : date.toLocaleDateString();
+    const dayDifference = Math.floor((now - date) / (1000 * 60 * 60 * 24));
+    
+    if (dayDifference < 1) {
+      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+    } else if (dayDifference === 1) {
+      return 'Yesterday';
+    } else if (dayDifference < 7) {
+      return date.toLocaleDateString([], { weekday: 'long' });
+    } else {
+      return `${String(date.getDate()).padStart(2, '0')}/${String(date.getMonth() + 1).padStart(2, '0')}/${date.getFullYear()}`;
+    }
   };
 
   const isMeSender = (senderId) => {

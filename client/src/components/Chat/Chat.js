@@ -242,7 +242,7 @@ const Chat = ({ friendId, userId }) => {
     } else if (diff < 7 * oneDay) {
       return date.toLocaleDateString('en-US', { weekday: 'long' });
     } else {
-      return date.toLocaleDateString();
+      return `${String(date.getDate()).padStart(2, '0')}/${String(date.getMonth() + 1).padStart(2, '0')}/${date.getFullYear()}`;
     }
   };
 
