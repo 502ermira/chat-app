@@ -197,4 +197,22 @@
   text-decoration: underline;
 }
 
+.new-messages-indicator {
+  position: fixed;
+  bottom: 70px;
+  left: 58%;
+  transform: translateX(-10%);
+  background-color:  rgba(2, 22, 20);
+  color: #eee;
+  padding: 11px 20px;
+  border-radius: 20px;
+  cursor: pointer;
+  z-index: 1000;
+  font-size: 15px;
+}
+
+.new-messages-indicator svg{
+  margin-right: 4px;
+  margin-bottom: -2px;
+}
 

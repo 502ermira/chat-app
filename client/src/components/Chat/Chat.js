@@ -11,6 +11,7 @@ import { TbPhoto } from "react-icons/tb";
 import { BsSend } from "react-icons/bs";
 import { useUnseenMessages } from '../../contexts/UnseenMessagesContext';
 import CustomAlert from '../CustomAlert/CustomAlert';
+import { FaAnglesDown } from "react-icons/fa6";
 
 const Chat = ({ friendId, userId }) => {
   const navigate = useNavigate();
@@ -28,13 +29,14 @@ const Chat = ({ friendId, userId }) => {
   const [isTyping, setIsTyping] = useState(false);
   const [friendTyping, setFriendTyping] = useState(false);
   const [alertMessage, setAlertMessage] = useState(null);
+  const [showNewMessagesIndicator, setShowNewMessagesIndicator] = useState(false);
   const socket = useSocket();
   const messagesEndRef = useRef(null);
   const observer = useRef();
   const typingTimeoutRef = useRef(null);
+  const isAtBottomRef = useRef(true);
   const { fetchUnseenMessagesCount } = useUnseenMessages();
   const MESSAGE_CHAR_LIMIT = 3100;
-  
 
   useEffect(() => {
     const fetchFriendUsername = async () => {
@@ -82,10 +84,10 @@ const Chat = ({ friendId, userId }) => {
   }, [friendId, socket]);  
 
   useEffect(() => {
-    if (messagesEndRef.current) {
+    if (isAtBottomRef.current && messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: 'auto' });
     }
-  }, [messages]);
+  }, [messages]);  
 
   useEffect(() => {
     const handleReceiveMessage = (data) => {
@@ -94,8 +96,10 @@ const Chat = ({ friendId, userId }) => {
           ...prevMessages,
           { ...data, timestamp: new Date(data.timestamp), seenAt: data.seenAt ? new Date(data.seenAt) : null },
         ]);
-        if (messagesEndRef.current) {
+        if (isAtBottomRef.current && messagesEndRef.current) {
           messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+        } else {
+          setShowNewMessagesIndicator(true);
         }
         socket.emit('messages_seen', { friendId });
       }
@@ -198,7 +202,7 @@ const Chat = ({ friendId, userId }) => {
           setMessage('');
           setImage(null);
   
-          if (messagesEndRef.current) {
+          if (isAtBottomRef.current && messagesEndRef.current) {
             messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
           }
         };
@@ -216,7 +220,7 @@ const Chat = ({ friendId, userId }) => {
         setMessages((prevMessages) => [...prevMessages, newMessage]);
         setMessage('');
   
-        if (messagesEndRef.current) {
+        if (isAtBottomRef.current && messagesEndRef.current) {
           messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
         }
       }
@@ -226,7 +230,7 @@ const Chat = ({ friendId, userId }) => {
         setIsTyping(false);
       }
     }
-  };   
+  };  
 
   const closeAlert = () => {
     setAlertMessage(null);
@@ -304,11 +308,38 @@ const Chat = ({ friendId, userId }) => {
     });
     if (node) observer.current.observe(node);
   }, [loading, hasMore]);
+
+  const handleScrollToBottom = () => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+      setShowNewMessagesIndicator(false);
+    }
+  };  
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (messagesEndRef.current) {
+        const isAtBottom = messagesEndRef.current.getBoundingClientRect().bottom <= window.innerHeight;
+        isAtBottomRef.current = isAtBottom;
+      }
+    };
+  
+    const messageList = document.querySelector('.message-list');
+    if (messageList) {
+      messageList.addEventListener('scroll', handleScroll);
+    }
+  
+    return () => {
+      if (messageList) {
+        messageList.removeEventListener('scroll', handleScroll);
+      }
+    };
+  }, []);  
   
   useEffect(() => {
     const intervalId = setInterval(() => {
       setMessages(prevMessages => [...prevMessages]);
-    }, 30000);
+    }, 3000);
   
     return () => clearInterval(intervalId);
   }, []);
@@ -471,6 +502,11 @@ const Chat = ({ friendId, userId }) => {
         </button>
         {friendTyping && <div className="typing-indicator">Typing...</div>}
       </div>
+       {showNewMessagesIndicator && (
+         <div className="new-messages-indicator" onClick={handleScrollToBottom}>
+          <FaAnglesDown />New Messages
+         </div>
+        )}
       <ul className="message-list">
         {renderMessages()}
         <div ref={messagesEndRef} />
