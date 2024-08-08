@@ -8,7 +8,8 @@ exports.getRecentChats = async (req, res) => {
     const recentChats = await Message.aggregate([
       {
         $match: {
-          $or: [{ sender: userId }, { recipient: userId }]
+          $or: [{ sender: userId }, { recipient: userId }],
+          deletedFor: { $ne: userId }
         }
       },
       {
@@ -101,6 +102,27 @@ exports.getUnseenMessagesCount = async (req, res) => {
     });
 
     res.json({ count: unseenCount });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.deleteMessagesWithFriend = async (req, res) => {
+  const userId = req.user._id;
+  const friendId = req.params.friendId;
+
+  try {
+    await Message.updateMany(
+      {
+        $or: [
+          { sender: userId, recipient: friendId },
+          { sender: friendId, recipient: userId }
+        ]
+      },
+      { $addToSet: { deletedFor: userId } }
+    );
+
+    res.json({ message: 'Messages deleted for you.' });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

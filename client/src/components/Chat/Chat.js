@@ -349,10 +349,12 @@ const Chat = ({ friendId, userId }) => {
     let lastMessageSeen = null;
     let lastMessageSentByUser = null;
 
-    const messageElements = messages.map((msg, index) => {
-      const currentDate = formatDate(new Date(msg.timestamp));
-      const showDate = currentDate !== lastDate;
-      lastDate = currentDate;
+    const filteredMessages = messages.filter(msg => !msg.deletedFor?.includes(userId));
+
+    const messageElements = filteredMessages.map((msg, index) => {
+    const currentDate = formatDate(new Date(msg.timestamp));
+    const showDate = currentDate !== lastDate;
+    lastDate = currentDate;
 
       const isSentMessage = msg.sender && msg.sender._id === userId;
       const ref = index === 0 ? lastMessageElementRef : null;

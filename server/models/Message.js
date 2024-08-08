@@ -8,7 +8,8 @@ const messageSchema = new mongoose.Schema({
   imageType: { type: String },
   timestamp: { type: Date, default: Date.now },
   seen: { type: Boolean, default: false },
-  seenAt: { type: Date } 
+  seenAt: { type: Date },
+  deletedFor: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
 });
 
 messageSchema.virtual('imagePath').get(function() {

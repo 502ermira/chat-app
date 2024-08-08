@@ -6,6 +6,7 @@ import { useSocket } from '../../contexts/SocketContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { useUnseenMessages } from '../../contexts/UnseenMessagesContext';
 import { AiOutlinePaperClip } from 'react-icons/ai';
+import { MdOutlineDeleteForever } from "react-icons/md";
 
 const RecentChats = () => {
   const { user } = useAuth();
@@ -160,6 +161,26 @@ const RecentChats = () => {
     );
   };
 
+  const handleDeleteMessages = async (friendId) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.error('No token found');
+      return;
+    }
+  
+    try {
+      await API.delete(`chats/messages/${friendId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setRecentChats(recentChats.filter(chat => chat.friend._id !== friendId));
+    } catch (error) {
+      console.error('Error deleting messages:', error);
+    }
+  };
+  
+
   return (
     <div className="recent-chats-container">
       {loading ? (
@@ -181,6 +202,15 @@ const RecentChats = () => {
                         <div className="recent-chat-header">
                           <p className="recent-chat-fullname">{chat.friend && chat.friend.fullName ? chat.friend.fullName : 'Unknown user'}</p>
                           <p className="recent-chat-timestamp">{chat.lastMessage ? formatDate(chat.lastMessage.timestamp) : ''}</p>
+                          <button
+                           onClick={(e) => {
+                           e.preventDefault(); 
+                           e.stopPropagation();
+                           handleDeleteMessages(chat.friend._id);
+                           }}
+                          >
+                           <MdOutlineDeleteForever /> 
+                          </button>
                         </div>
                         <p className="recent-chat-message">
                           {typingIndicators[chat.friend._id] ? (
