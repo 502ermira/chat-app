@@ -48,6 +48,18 @@ const FriendInfo = () => {
     }
   };
 
+  const handleClearChat = async () => {
+    try {
+      await API.delete(`/chats/messages/${id}`);
+      setMessage('Chat cleared successfully');
+      setTimeout(() => {
+        setMessage('');
+      }, 2000);
+    } catch (error) {
+      setError(error.response?.data?.message || 'Error clearing chat');
+    }
+  };
+
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
 
@@ -65,9 +77,9 @@ const FriendInfo = () => {
 
   return (
     <div className="user-profile">
-        <button className="back-button" onClick={() => navigate(-1)}>
-          <GoArrowLeft />
-        </button>
+      <button className="back-button" onClick={() => navigate(-1)}>
+        <GoArrowLeft />
+      </button>
       <div className="profile-view">
         <div className="profile-header">
           <img
@@ -77,9 +89,6 @@ const FriendInfo = () => {
             onClick={() => openModal(friend.profilePicture || 'https://i0.wp.com/www.repol.copl.ulaval.ca/wp-content/uploads/2019/01/default-user-icon.jpg?ssl=1')}
           />
           <h2 className="profile-name">{friend.fullName}</h2>
-          <button className="remove-friend-button" onClick={handleRemoveFriend}>
-            Remove Friend
-          </button>
         </div>
         <div className="info">
           <p className="info-item"><span className="info-label"><FaRegUser /></span> {friend.username}</p>
@@ -91,6 +100,17 @@ const FriendInfo = () => {
             {friend.gender}
           </p>
           <p className="info-item"><span className="info-label"><AiOutlineMail /></span> {friend.email}</p>
+          
+          <div className="info-item">
+            <button className="remove-friend-button" onClick={handleRemoveFriend}>
+              Remove Friend
+            </button>
+          </div>
+          <div className="info-item">
+            <button className="clear-chat-button" onClick={handleClearChat}>
+              Clear Chat
+            </button>
+          </div>
         </div>
         {message && <p className="success-message">{message}</p>}
         {showModal && <ImageModal imageUrl={modalImage} onClose={closeModal} />}

@@ -13,6 +13,7 @@ const RecentChats = () => {
   const { fetchUnseenMessagesCount } = useUnseenMessages();
   const [recentChats, setRecentChats] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [swipedChat, setSwipedChat] = useState(null);
   const [typingIndicators, setTypingIndicators] = useState({});
   const socket = useSocket();
   const location = useLocation();
@@ -180,6 +181,22 @@ const RecentChats = () => {
     }
   };
   
+  const handleTouchStart = (e, chatId) => {
+    setSwipedChat(null);
+    e.target.setAttribute('data-start-x', e.touches[0].clientX);
+  };
+  
+  const handleTouchMove = (e, chatId) => {
+    const startX = parseFloat(e.target.getAttribute('data-start-x'));
+    const moveX = e.touches[0].clientX;
+    const deltaX = startX - moveX;
+  
+    if (deltaX > 50) {
+      setSwipedChat(chatId);
+    } else if (deltaX < -50) {
+      setSwipedChat(null);
+    }
+  };
 
   return (
     <div className="recent-chats-container">
@@ -192,25 +209,24 @@ const RecentChats = () => {
           ) : (
             <div className="recent-chat-list">
               {recentChats.map((chat, index) => (
-                <Link key={index} to={`/chat/${chat.friend._id}`} className="recent-chat-link">
-                  <div className={`recent-chat-item ${chat.unopenedCount > 0 ? 'recent-chat-unseen' : ''}`}>
+                <div
+                  key={index}
+                  className="recent-chat-wrapper"
+                  onTouchStart={(e) => handleTouchStart(e, chat.friend._id)}
+                  onTouchMove={(e) => handleTouchMove(e, chat.friend._id)}
+                >
+                  <div className={`recent-chat-item ${swipedChat === chat.friend._id ? 'swiped' : ''}`}>
                     <div className="recent-chat-item-container">
                       <div className="recent-chat-avatar">
-                        <img src={chat.friend.profilePicture || 'https://i0.wp.com/www.repol.copl.ulaval.ca/wp-content/uploads/2019/01/default-user-icon.jpg?ssl=1'} alt="Profile" />
+                        <img
+                          src={chat.friend.profilePicture || 'https://i0.wp.com/www.repol.copl.ulaval.ca/wp-content/uploads/2019/01/default-user-icon.jpg?ssl=1'}
+                          alt="Profile"
+                        />
                       </div>
                       <div className="recent-chat-item-content">
                         <div className="recent-chat-header">
                           <p className="recent-chat-fullname">{chat.friend && chat.friend.fullName ? chat.friend.fullName : 'Unknown user'}</p>
                           <p className="recent-chat-timestamp">{chat.lastMessage ? formatDate(chat.lastMessage.timestamp) : ''}</p>
-                          <button
-                           onClick={(e) => {
-                           e.preventDefault(); 
-                           e.stopPropagation();
-                           handleDeleteMessages(chat.friend._id);
-                           }}
-                          >
-                           <MdOutlineDeleteForever /> 
-                          </button>
                         </div>
                         <p className="recent-chat-message">
                           {typingIndicators[chat.friend._id] ? (
@@ -226,7 +242,21 @@ const RecentChats = () => {
                       </div>
                     </div>
                   </div>
-                </Link>
+                  {swipedChat === chat.friend._id && (
+                    <div className="delete-box">
+                      <button
+                        className="delete-button"
+                        onClick={(e) => {
+                          e.preventDefault(); 
+                          e.stopPropagation();
+                          handleDeleteMessages(chat.friend._id);
+                        }}
+                      >
+                        <MdOutlineDeleteForever /> 
+                      </button>
+                    </div>
+                  )}
+                </div>
               ))}
             </div>
           )}
