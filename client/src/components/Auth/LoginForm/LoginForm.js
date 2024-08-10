@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import API from '../../api';
-import { useAuth } from '../../contexts/AuthContext';
+import { useNavigate, Link } from 'react-router-dom';
+import API from '../../../api';
+import { useAuth } from '../../../contexts/AuthContext';
+import './LoginForm.css';
 
 const LoginForm = () => {
   const [email, setEmail] = useState('');
@@ -26,23 +27,28 @@ const LoginForm = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} className="login-form">
       <input
         type="email"
         placeholder="Email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
+        className="login-input"
+        required
       />
       <input
         type="password"
         placeholder="Password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
+        className="login-input"
+        required
       />
-      <button type="submit" disabled={loading}>
+      <button type="submit" disabled={loading} className="login-button">
         {loading ? 'Loading...' : 'Login'}
       </button>
-      {message && <p>{message}</p>}
+      {message && <p className="error-message">{message}</p>}
+      <Link to="/forgot-password" className="forgot-password-link">Forgot Password?</Link>
     </form>
   );
 };

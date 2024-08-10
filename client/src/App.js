@@ -14,11 +14,14 @@ import { FriendRequestProvider } from './contexts/FriendRequestContext';
 import { UnseenMessagesProvider } from './contexts/UnseenMessagesContext';
 import { NotificationProvider } from './contexts/NotificationContext';
 import Notification from './components/Notification/Notification';
+import ForgotPassword from './components/Auth/ForgotPassword.js';
+import ResetPassword from './components/Auth/ResetPassword.js';
 import './App.css';
 
 const AppRoutes = () => {
   const { user } = useAuth();
   const isChatPage = useMatch('/chat/:friendId');
+  const isLoginForm = useMatch('/login');
   const location = useLocation();
 
   const hideNotifications = location.pathname === '/recent-chats';
@@ -34,8 +37,10 @@ const AppRoutes = () => {
         <Route path="/requests" element={user ? <RequestsPage /> : <Navigate to="/login" />} />
         <Route path="/recent-chats" element={user ? <RecentChatsPage /> : <Navigate to="/login" />} />
         <Route path="/friend/:id" element={user ? <FriendInfo /> : <Navigate to="/login" />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
       </Routes>
-      {!isChatPage && <BottomNav />}
+      {!isChatPage && !isLoginForm && <BottomNav />}
       <Notification hideNotifications={hideNotifications} />
     </>
   );
