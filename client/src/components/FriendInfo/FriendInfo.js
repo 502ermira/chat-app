@@ -60,7 +60,7 @@ const FriendInfo = () => {
     }
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <div><p className='loader'></p></div>;
   if (error) return <div>Error: {error}</div>;
 
   if (!isFriend) return <div>You are not friends with this user.</div>;

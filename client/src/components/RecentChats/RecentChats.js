@@ -8,6 +8,7 @@ import { useUnseenMessages } from '../../contexts/UnseenMessagesContext';
 import { AiOutlinePaperClip } from 'react-icons/ai';
 import { MdOutlineDeleteForever } from 'react-icons/md';
 import { IoCheckmarkDone, IoCheckmarkOutline } from "react-icons/io5";
+import Loader from '../Loader/Loader';
 
 const RecentChats = () => {
   const { user } = useAuth();
@@ -253,7 +254,7 @@ const RecentChats = () => {
     <div className="recent-chats-container">
       <h2>Chats</h2>
       {loading ? (
-        <p>Loading...</p>
+        <p className='loader'></p>
       ) : (
         <div>
           {recentChats.length === 0 ? (
