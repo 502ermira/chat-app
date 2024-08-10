@@ -1,11 +1,13 @@
 .user-profile {
   width: 100%;
   margin: 0 auto;
-  background: #09120c;
-  color: #ffffff;
+  background: linear-gradient(135deg, #13221d, #183832);
+  color: #eee;
   padding: 24px 19px;
-  height:92vh;
+  min-height:100vh;
   position: relative; 
+  padding-bottom: 8vh;
+  overflow-y: auto;
 }
 
 .user-profile-message, .error {

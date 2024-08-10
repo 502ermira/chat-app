@@ -92,6 +92,10 @@ const RecentChats = () => {
               return {
                 ...chat,
                 unopenedCount: 0,
+                lastMessage: {
+                  ...chat.lastMessage,
+                  seen: true,
+                },
               };
             }
             return chat;
