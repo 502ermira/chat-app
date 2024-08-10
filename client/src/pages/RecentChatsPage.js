@@ -16,8 +16,7 @@ const RecentChatsPage = () => {
   }, [clearNotifications]);
 
   return (
-    <div>
-      <h1>Recent Chats</h1>
+    <div className='recent-chats-page-container'>
       <RecentChats />
     </div>
   );
