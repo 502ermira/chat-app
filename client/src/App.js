@@ -22,6 +22,7 @@ const AppRoutes = () => {
   const { user } = useAuth();
   const isChatPage = useMatch('/chat/:friendId');
   const isLoginForm = useMatch('/login');
+  const isSignupForm = useMatch('/signup');
   const location = useLocation();
 
   const hideNotifications = location.pathname === '/recent-chats';
@@ -40,7 +41,7 @@ const AppRoutes = () => {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
       </Routes>
-      {!isChatPage && !isLoginForm && <BottomNav />}
+      {!isChatPage && !isLoginForm && !isSignupForm && <BottomNav />}
       <Notification hideNotifications={hideNotifications} />
     </>
   );

@@ -1,10 +1,13 @@
-import React from 'react';
-import SignupForm from '../components/Auth/SignupForm';
+import SignupForm from '../components/Auth/SingupForm/SignupForm';
+import { Link } from 'react-router-dom';
 
 const SignupPage = () => (
-  <div>
-    <h1>Signup</h1>
+  <div className="signup-page">
+    <h1 className="signup-title">e</h1>
     <SignupForm />
+    <p className="login-link">
+      Already have an account? <Link to="/login">Login</Link>
+    </p>
   </div>
 );
 

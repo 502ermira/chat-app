@@ -5,7 +5,6 @@
     justify-content: center;
     min-height: 100vh;
     background-image: url('../../../assets/bg.jpg');
-    padding-bottom: 15%;
     background-size: cover;
     backdrop-filter: blur(1000px);
   }
@@ -29,8 +28,8 @@
   }
 
   .login-title {
-    font-size: 7.3rem;
-    margin-bottom: 20px;
+    font-size: 7.4rem;
+    margin-top: -20px;
     font-family: "Anta", sans-serif;
     font-weight: 400;
     font-style: normal;
@@ -96,6 +95,11 @@
     font-weight: 700;
     border-radius: 5px;
   }
+
+  .login-button:hover {
+    background-color: #086c4d;
+    color: #e0e0e0;
+  }
   
   .login-button:disabled {
     background-color: #6c757d;
@@ -107,3 +111,14 @@
     font-size: 0.9rem;
   }
   
+  .forgot-password-link {
+    color:#e0e0e0;
+    text-decoration: none;
+    margin-top: 7px;
+    font-weight: 500;
+  }
+
+  .forgot-password-link:hover {
+    color: #086c4d;
+    font-weight: 700;
+  }
