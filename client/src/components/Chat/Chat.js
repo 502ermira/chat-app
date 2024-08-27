@@ -30,6 +30,8 @@ const Chat = ({ friendId, userId }) => {
   const [friendTyping, setFriendTyping] = useState(false);
   const [alertMessage, setAlertMessage] = useState(null);
   const [showNewMessagesIndicator, setShowNewMessagesIndicator] = useState(false);
+  const [imagePreviewUrl, setImagePreviewUrl] = useState(null);
+  const fileInputRef = useRef(null);
   const socket = useSocket();
   const messagesEndRef = useRef(null);
   const observer = useRef();
@@ -201,6 +203,7 @@ const Chat = ({ friendId, userId }) => {
           setMessages((prevMessages) => [...prevMessages, newMessage]);
           setMessage('');
           setImage(null);
+          setImagePreviewUrl(null); 
   
           if (isAtBottomRef.current && messagesEndRef.current) {
             messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
@@ -237,7 +240,30 @@ const Chat = ({ friendId, userId }) => {
   };
 
   const handleImageChange = (e) => {
-    setImage(e.target.files[0]);
+    const file = e.target.files[0];
+    if (file) {
+      const validImageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/bmp', 'image/webp'];
+      if (!validImageTypes.includes(file.type)) {
+        setAlertMessage('Please select a valid image file (JPEG, PNG, GIF, BMP, or WEBP)');
+        fileInputRef.current.value = "";
+        return;
+      }
+  
+      setImage(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreviewUrl(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };  
+
+  const clearSelectedImage = () => {
+    setImage(null);
+    setImagePreviewUrl(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
   };
 
   const formatTime = (date) => {
@@ -498,12 +524,12 @@ const Chat = ({ friendId, userId }) => {
           <div className="chat-header-info">
             <p className="friend-fullname">{friendFullName}</p>
             <p className="friend-username">@{friendUsername}</p>
+            {friendTyping && <div className="typing-indicator">Typing...</div>}
           </div>
         </div>
         <button className="profile-button" onClick={() => navigate(`/friend/${friendId}`)}>
           <MdOutlineManageAccounts />
         </button>
-        {friendTyping && <div className="typing-indicator">Typing...</div>}
       </div>
        {showNewMessagesIndicator && (
          <div className="new-messages-indicator" onClick={handleScrollToBottom}>
@@ -525,10 +551,18 @@ const Chat = ({ friendId, userId }) => {
           className={!isFriend ? "disabled-input" : ""}
         />
         <label className="image-upload-label">
-          <input type="file" onChange={handleImageChange} disabled={!isFriend} />
+          <input type="file" onChange={handleImageChange} disabled={!isFriend} ref={fileInputRef} accept="image/*" />
           <TbPhoto />
         </label>
         <button type="submit" disabled={!isFriend}><BsSend /></button>
+        {imagePreviewUrl && (
+           <div className="image-preview">
+             <img src={imagePreviewUrl} alt="Preview" />
+             <button type="button" className="clear-image-button" onClick={clearSelectedImage}>
+             ✖
+             </button>
+           </div>
+        )}
       </form>
       {!isFriend && (
         <div className="friendship-suggestion">

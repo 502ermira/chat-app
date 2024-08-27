@@ -216,3 +216,16 @@
   margin-bottom: -2px;
 }
 
+.image-preview {
+  display:flex;
+  align-items: center;
+  margin-left: 10px;
+  top: 10%;
+}
+
+.image-preview img {
+  max-width: 85px;
+  max-height: 85px;
+  border-radius: 5px;
+  margin-right: 10px;
+}
