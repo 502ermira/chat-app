@@ -1,3 +1,10 @@
+.friends-page {
+  background: linear-gradient(135deg, #13221d, #183832);
+  min-height: 100vh;
+  color:#eee;
+  padding-bottom: 8vh;
+}
+
 .friends-list {
     padding: 20px;
   }

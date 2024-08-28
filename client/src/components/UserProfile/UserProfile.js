@@ -9,6 +9,7 @@ import { IoEyeOutline } from "react-icons/io5";
 import { GrUpdate } from "react-icons/gr";
 import { FiLogOut } from "react-icons/fi";
 import { GiFemale, GiMale } from "react-icons/gi";
+import ImageModal from '../ImageModal/ImageModal';
 
 const UserProfile = () => {
   const [userData, setUserData] = useState({
@@ -25,6 +26,8 @@ const UserProfile = () => {
   const [editing, setEditing] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  const [modalImage, setModalImage] = useState(null);
+  const [showModal, setShowModal] = useState(false);
   const passwordRef = useRef(null);
 
   useEffect(() => {
@@ -151,7 +154,15 @@ const UserProfile = () => {
       passwordRef.current.focus();
     }, 0);
   };
+  const openModal = (imageUrl) => {
+    setModalImage(imageUrl);
+    setShowModal(true);
+  };
 
+  const closeModal = () => {
+    setModalImage(null);
+    setShowModal(false);
+  };
   return (
     <div className="user-profile">
       {message && <div className="user-profile-message">{message}</div>}
@@ -253,6 +264,7 @@ const UserProfile = () => {
               src={userData.profilePicture || 'https://i0.wp.com/www.repol.copl.ulaval.ca/wp-content/uploads/2019/01/default-user-icon.jpg?ssl=1'}
               alt="Profile"
               className="profile-picture"
+              onClick={() => openModal(userData.profilePicture || 'https://i0.wp.com/www.repol.copl.ulaval.ca/wp-content/uploads/2019/01/default-user-icon.jpg?ssl=1')}
             />
             <h2 className="profile-name">{userData.fullName}</h2>
           </div>
@@ -277,7 +289,9 @@ const UserProfile = () => {
             </p>
           </div>
           <button onClick={handleEdit} className="edit-button">Edit Profile</button>
+          {showModal && <ImageModal imageUrl={modalImage} onClose={closeModal} />}
         </div>
+        
       )}
     </div>
   );

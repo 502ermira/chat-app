@@ -3,11 +3,12 @@
   margin: 0 auto;
   background: linear-gradient(135deg, #13221d, #183832);
   color: #eee;
-  padding: 24px 19px;
+  padding: 30px 120px;
   min-height:100vh;
   position: relative; 
-  padding-bottom: 8vh;
+  padding-bottom: 10vh;
   overflow-y: auto;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
 }
 
 .user-profile-message, .error {
@@ -23,17 +24,27 @@
 
 .user-profile-message {
   background-color: #2e7d32;
-  margin-left:40%;
+  margin-top: 16px;
+  position: fixed;
+  font-size: 17px;
+  z-index: 1;
+  width:fit-content;
 }
 
 .error {
   background-color: #c62828;
+  margin-top: 33px;
+  position: fixed;
+  padding: 14px;
+  font-size: 17px;
 }
 
 .edit-form label {
   display: block;
   margin-bottom: 15px;
   color: #ffffff;
+  font-size: 15px;
+  text-transform: uppercase;
 }
 
 .edit-form{
@@ -42,14 +53,33 @@ padding-top:8%;
 
 .input-field {
   width: 100%;
-  padding: 10px;
+  padding: 15px;
   margin-top: 5px;
-  border: 1px solid #4a4a4a;
   border-radius: 5px;
-  background: #2a4729;
+  background-color: #183832;
   color: #ffffff;
+  border: none;
+  font-size: 16px;
+}
+.input-field::file-selector-button {
+  padding: 6px;
+  margin-right: 8px;
+  background-color: #e0e0e0;
+  color: rgb(3, 89, 49);
+  border: none;
+  font-size: 0.8rem;
+  cursor: pointer;
+  text-transform: uppercase;
+  font-weight: 700;
+  border-radius: 3px;
+  margin-top: -10px;
+  margin-bottom: -10px;
 }
 
+.input-field::file-selector-button:hover {
+  background-color: #086c4d;
+  color: #e0e0e0;
+}
 .button-group {
   display: flex;
   justify-content: space-between;
@@ -58,18 +88,24 @@ padding-top:8%;
 
 .save-button, .cancel-button, .edit-button, .update-button {
   width: 48%;
-  padding: 10px;
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  background: #006400;
+  background-color: #086c4d;
   color: #ffffff;
-  font-size: 16px;
+  font-size: 14px;
   transition: background 0.3s ease;
+  padding: 15px;
+  margin: 5px 0;
+  border: none;
+  font-size: 0.95rem;
+  cursor: pointer;
+  text-transform: uppercase;
+  font-weight: 700;
 }
 
 .save-button:hover, .cancel-button:hover, .edit-button:hover, .update-button:hover {
-  background: #004d00;
+  background: #054c36;
 }
 
 .save-button:disabled {
@@ -78,7 +114,7 @@ padding-top:8%;
 }
 
 .cancel-button {
-  background: #c62828;
+  background: #691414;
 }
 
 .profile-view {
@@ -91,12 +127,12 @@ padding-top:8%;
 }
 
 .profile-picture {
-  width: 127px;
-  height: 127px;
+  width: 140px;
+  height: 140px;
   border-radius: 50%;
   object-fit: cover;
-  background-color: #2a4729;
   margin-bottom: 12px;
+  border: 3px solid #097653;
 }
 
 .profile-name {
@@ -111,18 +147,11 @@ padding-top:8%;
 .info-item {
   display: flex;
   align-items: center;
-  margin: 38px 0px;
+  margin: 14px 0px;
   position: relative;
-}
-
-.info-item:not(:last-child)::after {
-  content: "";
-  position: absolute;
-  bottom: -19px;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(#4b8c4a, transparent);
+  background-color: #183832;
+  padding: 20px;
+  border-radius: 5px;
 }
 
 .info-label {
@@ -131,7 +160,7 @@ padding-top:8%;
   justify-content: center;
   flex: 0 0 40px;
   margin-right: 23px;
-  color: #4b8c4a;
+  color: #097653;
   font-size: 25px;
 }
 
@@ -143,6 +172,9 @@ padding-top:8%;
   color: #fff;
   font-size: 17px;
 }
+.info-item button:hover {
+  background: none;
+}
 
 .info-item{
   font-size:17px;
@@ -153,15 +185,28 @@ padding-top:8%;
   justify-content: space-between;
   align-items: flex-end;
   margin-right: 0;
-  margin-left: 45%;
+  margin-left: 78%;
 }
+
 .logout-button {
   font-size:20px;
 }
+
 .edit-button {
-  background: #006400;
+  padding: 18px;
+  margin: 5px 0;
+  background-color: #e0e0e0;
+  color: rgb(3, 89, 49);
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  text-transform: uppercase;
+  font-weight: 700;
+  border-radius: 5px;
 }
 
 .edit-button:hover {
-  background: #004d00;
+  background-color: #086c4d;
+  color: #e0e0e0;
 }
+

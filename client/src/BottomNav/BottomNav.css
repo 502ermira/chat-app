@@ -5,20 +5,19 @@
     display: flex;
     justify-content: space-around;
     background-color: rgba(2, 22, 20);
-    padding: 9px 0;
-    height:7vh;
+    padding: 9px 17px;
+    height:9.5vh;
   }
   
   .bottom-nav a {
     color: #eee;
     text-decoration: none;
-    padding: 10px;
+    padding: 6px 80px;
   }
   
   .bottom-nav a.active {
     font-weight: bold;
     border-bottom: 2px solid #eee;
-    margin-bottom: 1px;
   }
 
   .bottom-nav .badge {
@@ -31,7 +30,7 @@
   }
   
   .bottom-nav svg{
-    font-size: 20px;
+    font-size: 22px;
     margin-right: 2px;
   }
 

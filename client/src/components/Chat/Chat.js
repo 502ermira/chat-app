@@ -523,7 +523,7 @@ const Chat = ({ friendId, userId }) => {
           />
           <div className="chat-header-info">
             <p className="friend-fullname">{friendFullName}</p>
-            <p className="friend-username">@{friendUsername}</p>
+            {!friendTyping && <p className="friend-username">@{friendUsername}</p>}
             {friendTyping && <div className="typing-indicator">Typing...</div>}
           </div>
         </div>
