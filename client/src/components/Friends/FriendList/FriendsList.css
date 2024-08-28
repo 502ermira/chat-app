@@ -2,23 +2,39 @@
   background: linear-gradient(135deg, #13221d, #183832);
   min-height: 100vh;
   color:#eee;
-  padding-bottom: 8vh;
+  padding: 20px;
+}
+
+.friends-page h1{
+  margin-left: 20px;
 }
 
 .friends-list {
-    padding: 20px;
+  padding: 20px;
+  padding-bottom: 10vh;
   }
   
+  .friends-list h1 {
+    margin-left: 0px;
+    padding-bottom: 20px;
+    }
+    
   .friend-item {
     display: flex;
     align-items: center;
-    padding: 10px;
+    padding: 13px 20px;
     cursor: pointer;
-    border-bottom: 1px solid #ccc;
+    background: linear-gradient(#173530, #142d29);
   }
-  
-  .friend-item:hover {
-    background-color: #f0f0f0;
+
+  .friend-item:first-child{
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+  }
+
+  .friend-item:last-child{
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
   }
   
   .friend-profile-picture {
@@ -39,5 +55,10 @@
   
   .friend-username {
     color: #555;
+  }
+
+  .friends-list-number{
+    font-size: 30px;
+    font-weight: 600;
   }
   

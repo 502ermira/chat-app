@@ -4,36 +4,55 @@
 
 .send-friend-request-container input[type="text"] {
   width: 100%;
-  padding: 10px;
-  margin-bottom: 20px;
+  padding: 12px;
+  margin-bottom: 10px;
   box-sizing: border-box;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  background-color: #183832;
+  color: #ffffff;
+  border: none;
+  font-size: 15px;
+  border-radius: 12px;
+  outline: none;
 }
+
+ .send-friend-request-container input[type="text"]::placeholder{
+  color:#888;
+  font-size: 14px;
+  opacity: 0.6;
+ }
 
 .send-friend-request-container ul {
   list-style-type: none;
   padding: 0;
+  background-color: #142d29; 
+  border-bottom-left-radius: 20px ;
+  border-bottom-right-radius: 20px;
+  border-top-left-radius: 20px;
 }
 
 .send-friend-request-container li {
   display: flex;
   align-items: center;
-  padding: 10px;
-  border: 1px solid #ddd;
-  margin-bottom: 10px;
-  border-radius: 4px;
+  padding: 12px 20px;
+  margin-bottom: 3px;
   cursor: pointer;
   transition: background-color 0.3s ease;
+  background: linear-gradient(#173530, #142d29);
+  border-bottom-left-radius: 20px ;
+  border-bottom-right-radius: 20px;
+}
+.send-friend-request-container li:first-child {
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
 }
 
 .send-friend-request-container li:hover {
-  background-color: #f0f0f0;
+  background-color: #183832;
 }
 
 .friend-profile-picture {
-  width: 40px;
-  height: 40px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
   margin-right: 10px;
 }
@@ -54,4 +73,12 @@
 
 .send-friend-request-container button {
   margin-left: auto;
+  font-size: 12px;
+  padding: 8px 20px;
+  margin-top: -2.5%;
+}
+
+.friends-symbol{
+  font-size: 14px;
+  color:#bbb;
 }

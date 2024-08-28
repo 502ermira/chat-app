@@ -4,7 +4,7 @@ import SendFriendRequest from '../components/Friends/SendFriendRequest/SendFrien
 
 const FriendsPage = () => (
   <div className='friends-page'>
-    <h1>Friends</h1>
+    <h1>Add New Friends</h1>
     <SendFriendRequest />
     <FriendsList />
   </div>

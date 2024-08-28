@@ -105,6 +105,10 @@ exports.searchUsers = async (req, res) => {
   const loggedInUserId = req.user._id;
 
   try {
+    if (!username.trim()) {
+      return res.json([]);
+    }
+
     const users = await User.find({
       username: { $regex: `^${username}`, $options: 'i' }
     }).select('username fullName profilePicture');
@@ -119,6 +123,7 @@ exports.searchUsers = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
 
 exports.getFriends = async (req, res) => {
   try {

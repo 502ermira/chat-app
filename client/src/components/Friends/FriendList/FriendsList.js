@@ -28,7 +28,7 @@ const FriendsList = () => {
 
   return (
     <div className="friends-list">
-      <h1>Friends List</h1>
+      <h1>My Friends <span className='friends-list-number'>({friends.length})</span></h1>
       <ul>
         {friends.map((friend) => (
           <li key={friend._id} onClick={() => handleChatSelect(friend._id)} className="friend-item">

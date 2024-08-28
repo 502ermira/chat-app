@@ -1,8 +1,10 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import API from '../../../api';
 import debounce from 'lodash.debounce';
 import './SendFriendRequest.css';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const SendFriendRequest = () => {
   const [username, setUsername] = useState('');
@@ -12,6 +14,8 @@ const SendFriendRequest = () => {
   const [userFriends, setUserFriends] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
   const navigate = useNavigate();
+
+  const latestUsernameRef = useRef(username);
 
   const fetchPendingRequests = useCallback(async () => {
     const token = localStorage.getItem('token');
@@ -42,28 +46,42 @@ const SendFriendRequest = () => {
     fetchUserFriends();
   }, [fetchPendingRequests, fetchUserFriends]);
 
-  const fetchUsers = debounce(async (searchUsername) => {
-    if (searchUsername.trim() === '') {
-      setUsers([]);
-      return;
-    }
+  const fetchUsers = useCallback(
+    debounce(async (searchUsername) => {
+      if (latestUsernameRef.current !== searchUsername) return;
 
-    const token = localStorage.getItem('token');
-    try {
-      const { data } = await API.get(`/friends/search?username=${searchUsername}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setUsers(data);
-      filterUsers(data);
-    } catch (error) {
-      setMessage(error.response.data.message || 'Error searching users');
-    }
-  }, 300);
+      if (searchUsername.trim() === '') {
+        setUsers([]);
+        return;
+      }
+
+      const token = localStorage.getItem('token');
+      try {
+        const { data } = await API.get(`/friends/search?username=${searchUsername}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (latestUsernameRef.current === searchUsername) {
+          setUsers(data);
+          filterUsers(data);
+        }
+      } catch (error) {
+        setMessage(error.response.data.message || 'Error searching users');
+      }
+    }, 300),
+    []
+  );
 
   const handleSearchChange = (e) => {
     const searchTerm = e.target.value;
     setUsername(searchTerm);
-    fetchUsers(searchTerm);
+    latestUsernameRef.current = searchTerm;
+
+    if (searchTerm.trim() === '') {
+      setUsers([]);
+      setFilteredUsers([]);
+    } else {
+      fetchUsers(searchTerm);
+    }
   };
 
   const handleAddFriend = async (recipientUsername) => {
@@ -72,10 +90,10 @@ const SendFriendRequest = () => {
       const { data } = await API.post('/friends/send', { recipientUsername }, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setMessage(`Friend request sent to ${recipientUsername}`);
+      toast.success(`Friend request sent to @${recipientUsername}`);
       fetchPendingRequests();
     } catch (error) {
-      setMessage(error.response.data.message || 'Error sending friend request');
+      toast.error(error.response.data.message || 'Error sending friend request');
     }
   };
 
@@ -85,10 +103,10 @@ const SendFriendRequest = () => {
       const { data } = await API.post('/friends/cancel', { requestId }, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setMessage(`Friend request canceled`);
+      toast.info('Friend request canceled');
       fetchPendingRequests();
     } catch (error) {
-      setMessage(error.response.data.message || 'Error canceling friend request');
+      toast.error(error.response.data.message || 'Error canceling friend request');
     }
   };
 
@@ -123,16 +141,16 @@ const SendFriendRequest = () => {
     const isFriend = userFriends.some(friend => friend._id === user._id);
 
     if (isFriend) {
-      return <span>&nbsp;- Friends</span>;
+      return <span className='friends-symbol'>&nbsp;~ Friends</span>;
     } else {
       const pendingRequest = pendingRequests.find(request => request.recipient.username === user.username && request.status === 'pending');
 
       if (pendingRequest) {
         return (
-          <button onClick={() => handleCancelRequest(pendingRequest._id)}>Requested</button>
+          <button onClick={() => handleCancelRequest(pendingRequest._id)} className='button'>Requested</button>
         );
       } else {
-        return <button onClick={() => handleAddFriend(user.username)}>Add</button>;
+        return <button onClick={() => handleAddFriend(user.username)} className='button'>Add</button>;
       }
     }
   };
@@ -141,7 +159,7 @@ const SendFriendRequest = () => {
     <div className="send-friend-request-container">
       <input
         type="text"
-        placeholder="Search Username"
+        placeholder="Search Username..."
         value={username}
         onChange={handleSearchChange}
         className="search-input"
@@ -159,6 +177,17 @@ const SendFriendRequest = () => {
         ))}
       </ul>
       {message && <p>{message}</p>}
+      <ToastContainer
+       position="top-center"
+       autoClose={3400}
+       newestOnTop={false}
+       closeOnClick
+       rtl={false}
+       theme="colored"
+       hideProgressBar={true}
+       style={{ width: '420px', borderRadius: '10px', fontSize: '16px' }}
+       toastStyle={{ backgroundColor: '#173530', color: '#eee', boxShadow : '0 8px 20px rgba(0, 0, 0, 0.5)' }}
+      />
     </div>
   );
 };

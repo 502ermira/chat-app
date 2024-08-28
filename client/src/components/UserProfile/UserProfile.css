@@ -3,10 +3,10 @@
   margin: 0 auto;
   background: linear-gradient(135deg, #13221d, #183832);
   color: #eee;
-  padding: 30px 120px;
+  padding: 30px 150px;
   min-height:100vh;
   position: relative; 
-  padding-bottom: 10vh;
+  padding-bottom: 13vh;
   overflow-y: auto;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
 }
@@ -137,11 +137,11 @@ padding-top:8%;
 
 .profile-name {
   margin: 0;
-  font-size: 24px;
+  font-size: 25px;
 }
 
 .info {
-  padding: 10px 10px 20px 10px;
+  padding: 5px 5px 20px 5px;
 }
 
 .info-item {
@@ -149,7 +149,7 @@ padding-top:8%;
   align-items: center;
   margin: 14px 0px;
   position: relative;
-  background-color: #183832;
+  background: linear-gradient(#183832, rgb(19, 43, 39));
   padding: 20px;
   border-radius: 5px;
 }
@@ -192,7 +192,7 @@ padding-top:8%;
   font-size:20px;
 }
 
-.edit-button {
+.edit-button, .button {
   padding: 18px;
   margin: 5px 0;
   background-color: #e0e0e0;
@@ -205,7 +205,7 @@ padding-top:8%;
   border-radius: 5px;
 }
 
-.edit-button:hover {
+.edit-button, .button:hover {
   background-color: #086c4d;
   color: #e0e0e0;
 }
