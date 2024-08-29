@@ -12,6 +12,7 @@ import { BsSend } from "react-icons/bs";
 import { useUnseenMessages } from '../../contexts/UnseenMessagesContext';
 import CustomAlert from '../CustomAlert/CustomAlert';
 import { FaAnglesDown } from "react-icons/fa6";
+import imageCompression from 'browser-image-compression';
 
 const Chat = ({ friendId, userId }) => {
   const navigate = useNavigate();
@@ -239,22 +240,32 @@ const Chat = ({ friendId, userId }) => {
     setAlertMessage(null);
   };
 
-  const handleImageChange = (e) => {
+  const handleImageChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      const validImageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/bmp', 'image/webp'];
-      if (!validImageTypes.includes(file.type)) {
-        setAlertMessage('Please select a valid image file (JPEG, PNG, GIF, BMP, or WEBP)');
-        fileInputRef.current.value = "";
-        return;
+      const options = {
+        maxSizeMB: 0.5,
+        maxWidthOrHeight: 1024,
+        useWebWorker: true,
+      };
+  
+      let compressedFile = await imageCompression(file, options);
+  
+      const MAX_ALLOWED_SIZE_MB = 10;
+      const fileSizeMB = compressedFile.size / 1024 / 1024;
+  
+      if (fileSizeMB > MAX_ALLOWED_SIZE_MB) {
+        options.maxSizeMB = 7;
+        options.maxWidthOrHeight = 400;
+        compressedFile = await imageCompression(file, options);
       }
   
-      setImage(file);
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreviewUrl(reader.result);
+        setImage(compressedFile);
       };
-      reader.readAsDataURL(file);
+      reader.readAsDataURL(compressedFile);
     }
   };  
 
@@ -558,8 +569,8 @@ const Chat = ({ friendId, userId }) => {
         {imagePreviewUrl && (
            <div className="image-preview">
              <img src={imagePreviewUrl} alt="Preview" />
-             <button type="button" className="clear-image-button" onClick={clearSelectedImage}>
-             ✖
+             <button type="button" onClick={clearSelectedImage}>
+             <span className="clear-image-button">✖</span>
              </button>
            </div>
         )}

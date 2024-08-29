@@ -37,6 +37,10 @@
     border-bottom-right-radius: 20px;
   }
   
+  .friend-item:hover{
+    background: linear-gradient(#023631, #26413c);
+  }
+  
   .friend-profile-picture {
     width: 40px;
     height: 40px;

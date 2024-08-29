@@ -163,7 +163,7 @@ const RespondFriendRequest = () => {
     <div className="respond-friend-request">
       <h1>Friend Requests</h1>
       <div className="request-summary" onClick={() => setShowRequests(!showRequests)}>
-        <h2>Requests</h2>
+        <h2>See Requests</h2>
         <p>{pendingRequests.length} friend requests</p>
       </div>
       {showRequests && (
@@ -180,15 +180,15 @@ const RespondFriendRequest = () => {
                 <p className="requester-username">@{request.friend.username}</p>
               </div>
               <div className="buttons-container">
-                <button className="respond-button accept" onClick={() => handleRespond(request._id, 'accepted')}>Accept</button>
-                <button className="respond-button decline" onClick={() => handleRespond(request._id, 'declined')}>Decline</button>
+                <button className="respond-button accept button" onClick={() => handleRespond(request._id, 'accepted')}>Accept</button>
+                <button className="respond-button decline button" onClick={() => handleRespond(request._id, 'declined')}>Decline</button>
               </div>
             </li>
           ))}
         </ul>
       )}
 
-      <h2>Notifications</h2>
+      <h2 className='request-notifications-title'>All Notifications</h2>
       {['today', 'thisWeek', 'thisMonth', 'older'].map(category => (
         categorizedRequests[category].length > 0 && (
           <div key={category} className="category">
@@ -213,8 +213,8 @@ const RespondFriendRequest = () => {
                   </div>
                   {request.status === 'pending' && request.recipient._id === user.id && (
                     <div className="buttons-container">
-                      <button className="respond-button accept" onClick={() => handleRespond(request._id, 'accepted')}>Accept</button>
-                      <button className="respond-button decline" onClick={() => handleRespond(request._id, 'declined')}>Decline</button>
+                      <button className="respond-button accept button" onClick={() => handleRespond(request._id, 'accepted')}>Accept</button>
+                      <button className="respond-button decline button" onClick={() => handleRespond(request._id, 'declined')}>Decline</button>
                     </div>
                   )}
                 </li>

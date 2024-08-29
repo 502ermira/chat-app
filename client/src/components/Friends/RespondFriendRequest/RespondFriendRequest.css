@@ -1,14 +1,35 @@
 .respond-friend-request {
-  padding: 20px;
+  padding: 20px 40px;
   background: linear-gradient(135deg, #13221d, #183832);
   min-height: 100vh;
   color:#eee;
-  padding-bottom: 8vh;
-}
+  padding-bottom: 10vh;
+ }
+
+ .respond-friend-request h1{
+  text-transform: uppercase;
+  margin-bottom: 10px;
+ }
 
 .request-list {
   list-style-type: none;
   padding: 0;
+  margin-bottom: 20px;
+  margin-top: 2px;
+}
+
+.category {
+  margin-top: 10px;
+}
+
+.category h3{
+  margin-bottom: 10px;
+  margin-left: 10px;
+}
+
+.request-notifications-title {
+ text-transform: uppercase;
+ margin-top:13px;
 }
 
 .request-item {
@@ -16,20 +37,20 @@
   align-items: center;
   padding: 10px;
   cursor: pointer;
-  border-bottom: 1px solid #ccc;
+  border-bottom: 1px solid #f6fffe06;
   transition: background-color 0.3s ease;
   flex-wrap: wrap;
 }
 
 .request-item:hover {
-  background-color: #f0f0f0;
+  background-color: #13221d;
 }
 
 .requester-profile-picture {
-  width: 40px;
-  height: 40px;
+  width: 53px;
+  height: 53px;
   border-radius: 50%;
-  margin-right: 10px;
+  margin-right: 11px;
 }
 
 .requester-details {
@@ -40,10 +61,11 @@
 
 .requester-full-name {
   font-weight: bold;
+  font-size: 17px;
 }
 
 .requester-username {
-  color: #555;
+  color: #666;
 }
 
 .notification-container {
@@ -56,12 +78,12 @@
 }
 
 .request-notification {
-  margin-right:7px;
+  margin-right:14px;
 }
 
 .request-date {
   color: #999;
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .buttons-container {
@@ -72,31 +94,41 @@
 .respond-button {
   cursor: pointer;
   border: none;
-  padding: 8px 16px;
+  padding: 8px 15px;
   border-radius: 5px;
-  font-size: 14px;
+  font-size: 12.5px;
+  color:#ddd;
 }
 
 .accept {
-  background-color: #4caf50;
-  color: white;
+  background-color: #113d2c;
 }
 
 .decline {
-  background-color: #f44336;
-  color: white;
+  background-color: #541a16;
 }
 
 .request-summary {
   cursor: pointer;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  padding: 10px;
+  border-radius: 10px;
+  padding: 12px;
   transition: background-color 0.3s ease;
+  margin-top:10px;
+  background: #00000035;
+}
+
+.request-summary h2 {
+  margin-bottom:6px;
+  text-transform: uppercase;
+}
+
+.request-summary p {
+  margin-bottom:5px;
+  font-size: 17px;
 }
 
 .request-summary:hover {
-  background-color: #f0f0f0;
+  background: #00000060;
 }
 
 .request-message {

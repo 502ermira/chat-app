@@ -2,18 +2,19 @@
   background: linear-gradient(135deg, #13221d, #183832);
   min-height: 100vh;
   color:#eee;
-  padding-bottom: 8vh;
+  padding-bottom: 9vh;
   overflow-y: auto;
   width: 100%;
 }
 
 .recent-chats-container h2{
-  margin:10px 0 22px 0;
-  font-size: 28px;
+  margin:10px 0 20px 0;
+  font-size: 29px;
+  text-transform: uppercase;
 }
 
 .recent-chats-container {
-  padding: 15px;
+  padding: 20px;
 }
 
 .recent-chat-list {
@@ -29,7 +30,7 @@
 
 .recent-chat-item {
   width: 100%;
-  background-color: #33413e;
+  background-color: #33433e;
   padding: 10px;
   border-radius: 5px;
   display: flex;
@@ -39,6 +40,11 @@
   transition: transform 0.3s ease-in-out;
   text-decoration: none;
   position: relative;
+}
+
+.recent-chat-item:hover {
+  background-color: #2c3a35;
+
 }
 
 .recent-chat-item.swiped {
@@ -96,7 +102,7 @@
 }
 
 .recent-chat-unseen {
-   background-color: #39594e;
+   background-color: #324e44;
 }
 
 .unopened-count {

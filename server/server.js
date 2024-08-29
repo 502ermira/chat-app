@@ -2,6 +2,7 @@ const express = require('express');
 const dotenv = require('dotenv');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const sharp = require('sharp');
 const authRoutes = require('./routes/authRoutes');
 const friendRoutes = require('./routes/friendRoutes');
 const messageRoutes = require('./routes/messageRoutes');
@@ -25,7 +26,8 @@ const io = new Server(server, {
 });
 
 app.use(cors());
-app.use(express.json({ limit: '11mb' }));
+app.use(express.json({ limit: '100mb' }));
+app.use(express.urlencoded({ limit: '100mb', extended: true }));
 
 // Middleware to add io to req
 app.use((req, res, next) => {
@@ -59,31 +61,52 @@ io.on('connection', (socket) => {
   socket.join(socket.user._id.toString());
 
   // Handle sending messages
+  const MAX_WIDTH = 1024;
+  const MAX_HEIGHT = 1024;
+  
   socket.on('send_message', async (data) => {
     try {
+      let imageBuffer = null;
+  
+      if (data.image) {
+        const buffer = Buffer.from(data.image, 'base64');
+        const { width, height } = await sharp(buffer).metadata();
+  
+        // Compress if the image dimensions exceed the max dimensions
+        if (width > MAX_WIDTH || height > MAX_HEIGHT) {
+          imageBuffer = await sharp(buffer)
+            .resize(MAX_WIDTH, MAX_HEIGHT, { fit: 'inside' })
+            .jpeg({ quality: QUALITY })
+            .toBuffer();
+        } else {
+          imageBuffer = buffer;
+        }
+      }
+  
       const message = new Message({
         sender: socket.user._id,
         recipient: data.recipientId,
         message: data.message || null,
-        image: data.image ? Buffer.from(data.image, 'base64') : null,
-        imageType: data.imageType || null
+        image: imageBuffer,
+        imageType: 'image/jpeg',
       });
+  
       await message.save();
-
+  
       io.to(data.recipientId).emit('receive_message', {
         _id: message._id,
         sender: socket.user,
         recipient: data.recipientId,
         message: data.message || null,
-        image: data.image ? `data:${data.imageType};base64,${data.image}` : null,
+        image: imageBuffer ? `data:image/jpeg;base64,${imageBuffer.toString('base64')}` : null,
         timestamp: message.timestamp,
         seen: message.seen,
-        seenAt: message.seenAt, 
+        seenAt: message.seenAt,
       });
     } catch (error) {
       console.error('Error saving message:', error);
     }
-  });
+  });  
 
   // Handle marking messages as seen
   socket.on('messages_seen', async ({ friendId }) => {

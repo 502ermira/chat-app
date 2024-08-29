@@ -220,18 +220,30 @@
   display:flex;
   align-items: center;
   margin-left: 10px;
-  top: 10%;
+  margin-top: -8px;
+  margin-bottom: -7px;
 }
 
 .image-preview img {
-  max-width: 85px;
-  max-height: 85px;
-  border-radius: 5px;
-  margin-right: 10px;
+  max-width: auto;
+  max-height: 45px;
+  border-radius: 4px;
+  margin-right: 8px;
+}
+
+.clear-image-button {
+  font-size: 19px;
 }
 
 .typing-indicator {
   font-size: small;
   color:#aaa;
   margin-top: 1px;
+}
+
+.message-image {
+  max-width: 1024px;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
 }
