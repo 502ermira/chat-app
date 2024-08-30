@@ -19,15 +19,16 @@
   object-fit: contain;
   touch-action: none;
 }
-.save-button {
+.save-image-button {
     position: absolute;
     top: 17px;
     right: 30px;
     padding: 7px 20px;
     z-index: 10000;
     width: fit-content;
+  
   }
-  .save-button svg{
+  .save-image-button svg{
     margin-bottom: -4px;
     font-size: 20px;
   }

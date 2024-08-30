@@ -34,7 +34,9 @@ export const UnseenMessagesProvider = ({ children }) => {
         const currentFriendId = window.location.pathname.split('/chat/')[1];
         addNotification({
           username: newMessage.sender.username,
+          fullName: newMessage.sender.fullName,
           message: newMessage.message,
+          profilePicture: newMessage.sender.profilePicture,
           timestamp: new Date(newMessage.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
           senderId: newMessage.sender._id,
           type: 'message'

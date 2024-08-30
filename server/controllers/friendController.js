@@ -53,6 +53,8 @@ exports.sendFriendRequest = async (req, res) => {
       requester: {
         _id: req.user._id,
         username: req.user.username,
+        fullName: req.user.fullName,
+        profilePicture: req.user.profilePicture,
       },
     });
 

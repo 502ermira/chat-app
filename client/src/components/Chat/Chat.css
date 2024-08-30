@@ -220,15 +220,16 @@
   display:flex;
   align-items: center;
   margin-left: 10px;
-  margin-top: -8px;
-  margin-bottom: -7px;
+  margin-top: -9px;
+  margin-bottom: -9px;
 }
 
 .image-preview img {
   max-width: auto;
-  max-height: 45px;
+  max-height: 46px;
   border-radius: 4px;
   margin-right: 8px;
+  max-width: 59px;
 }
 
 .clear-image-button {

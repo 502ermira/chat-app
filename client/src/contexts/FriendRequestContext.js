@@ -34,6 +34,8 @@ export const FriendRequestProvider = ({ children }) => {
         addNotification({
           username: request.requester.username,
           message: 'sent you a friend request',
+          fullName: request.requester.fullName,
+          profilePicture: request.requester.profilePicture,
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
           senderId: request.requester._id,
           type: 'friendRequest'

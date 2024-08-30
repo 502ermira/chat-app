@@ -1,11 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
 import PanZoom from 'react-easy-panzoom';
 import { MdSaveAlt } from "react-icons/md";
+import { useMatch } from 'react-router-dom';
 import './ImageModal.css';
 
 const ImageModal = ({ imageUrl, onClose }) => {
   const [isDragging, setIsDragging] = useState(false);
   const panZoomRef = useRef(null);
+
+  const isChatPage = useMatch('/chat/:friendId');
 
   useEffect(() => {
     const handleMouseUp = () => {
@@ -40,7 +43,7 @@ const ImageModal = ({ imageUrl, onClose }) => {
     e.stopPropagation();
     const link = document.createElement('a');
     link.href = imageUrl;
-    link.download = 'e-network-image.jpg';
+    link.download = 'er-net-image.jpg';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -48,9 +51,11 @@ const ImageModal = ({ imageUrl, onClose }) => {
 
   return (
     <div className="image-modal-overlay" onClick={onClose}>
-      <button className="save-button" onClick={handleSaveImage}>
-        <MdSaveAlt /> Save
-      </button>
+      {isChatPage && (
+        <button className="save-image-button save-button" onClick={handleSaveImage}>
+          <MdSaveAlt /> Save
+        </button>
+      )}
       <PanZoom
         ref={panZoomRef}
         autoCenter={true}
