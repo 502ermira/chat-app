@@ -1,0 +1,32 @@
+.not-friends-page{
+    background: linear-gradient(135deg, #13221d, #183832);
+    height:100vh;
+}
+
+.not-friends-page p {
+    margin-left: 10px;
+}
+
+.not-friends-page .back-button{
+    text-align: center;
+    align-content: center;
+    font-size: 30px;
+    text-transform: uppercase;
+}
+
+.not-friends-page .back-button svg{
+    font-size: 47px;
+    margin-bottom: -13px;
+    border-radius: 50%;
+    background-color: rgb(2, 100, 62);
+    padding: 5px;
+}
+
+.info-item .clear-chat-button, .info-item .remove-friend-button{
+    font-size: 18px;
+    padding: 4px 20px;
+    color:#eee;
+}
+.remove-friend-button {
+    top: 20px;
+}

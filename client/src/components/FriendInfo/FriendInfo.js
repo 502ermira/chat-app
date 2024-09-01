@@ -54,7 +54,7 @@ const FriendInfo = () => {
       setMessage('Chat cleared successfully');
       setTimeout(() => {
         setMessage('');
-      }, 2000);
+      }, 5000);
     } catch (error) {
       setError(error.response?.data?.message || 'Error clearing chat');
     }
@@ -63,7 +63,12 @@ const FriendInfo = () => {
   if (loading) return <div><p className='loader'></p></div>;
   if (error) return <div>Error: {error}</div>;
 
-  if (!isFriend) return <div>You are not friends with this user.</div>;
+  if (!isFriend) return <div className='not-friends-page friendship-suggestion'>      
+  <button className="back-button" onClick={() => navigate(-1)}>
+  <GoArrowLeft /> Click to go back
+  </button>
+  <p>You are not friends with this user.</p>
+  </div>;
 
   const openModal = (imageUrl) => {
     setModalImage(imageUrl);

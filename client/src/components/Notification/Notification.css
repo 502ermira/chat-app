@@ -15,7 +15,7 @@
   margin: 10px;
   border-radius: 5px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  width: 87%;
+  width: 65%;
   font-size: 1.05rem;
   display: flex;
   align-items: center;
@@ -70,12 +70,18 @@
 }
 
 @media (max-width: 768px) {
+  .notification-item {
+    width: 75%;
+  }
   .notification-message {
     max-width: 600px;
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 485px) {
+  .notification-item {
+    width: 87%;
+  }
   .notification-message {
     max-width: 320px;
   }

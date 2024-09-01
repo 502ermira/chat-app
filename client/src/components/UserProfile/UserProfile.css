@@ -61,6 +61,15 @@ padding-top:8%;
   border: none;
   font-size: 16px;
 }
+
+.input-field option {
+  background-color: #13221d;
+  color: #eee;
+  font-size: 16px;
+  padding: 10px;
+  width: fit-content;
+}
+
 .input-field::file-selector-button {
   padding: 6px;
   margin-right: 8px;
@@ -208,4 +217,397 @@ padding-top:8%;
 .edit-button, .button:hover {
   background-color: #014639;
   color: #e0e0e0;
+}
+
+@media (max-width: 480px) {
+  .user-profile {
+    padding: 20px 15px;
+    padding-bottom: 7vh;
+    box-shadow: none;
+  }
+
+  .profile-header {
+    padding: 17px;
+  }
+
+  .profile-picture {
+    width: 112px;
+    height: 112px;
+    margin-bottom: 10px;
+  }
+
+  .profile-name {
+    font-size: 22px;
+  }
+
+  .info-item {
+    padding: 14px;
+    margin: 10px 0px;
+  }
+
+  .info-label {
+    margin-right: 10px;
+    margin-bottom: 5px;
+  }
+
+  .info-item .update-button {
+    margin-left: 51%;
+    font-size: 15px;
+  }
+
+  .input-field {
+    padding: 12px;
+    font-size: 14px;
+  }
+
+  .button-group {
+    gap: 13px;
+  }
+
+  .save-button, .cancel-button, .edit-button, .update-button {
+    width: 100%;
+    padding: 12px;
+  }
+
+  .edit-button, .button {
+    padding: 12px;
+    font-size: 15.5px;
+  }
+
+  .user-profile-message, .error {
+    font-size: 15px;
+    padding: 10px;
+    margin-top: 18px;
+    width: 65%;
+  }
+
+  .input-field option {
+    background-color: #13221d;
+    color: #eee;
+    font-size: 9.5px;
+    padding: 0px;
+  }
+}
+
+@media (min-width: 481px) and (max-width: 767px) {
+  .user-profile {
+    padding: 25px;
+    min-height: 100vh;
+    padding-bottom: 13vh;
+  }
+
+  .profile-header {
+    padding: 15px;
+  }
+
+  .profile-picture {
+    width: 110px;
+    height: 110px;
+    margin-bottom: 12px;
+  }
+
+  .profile-name {
+    font-size: 23px;
+  }
+
+  .info-item {
+    padding: 18px;
+    margin: 12px 0;
+  }
+
+  .info-label {
+    margin-right: 12px;
+    margin-bottom: 5px;
+  }
+
+  .info-item .update-button {
+    margin-left: 60%;
+    font-size: 16px;
+  }
+
+  .input-field {
+    padding: 14px;
+    font-size: 15px;
+  }
+
+  .button-group {
+    flex-direction: column;
+  }
+
+  .save-button, .cancel-button, .edit-button, .update-button {
+    width: 100%;
+    padding: 14px;
+  }
+
+  .edit-button, .button {
+    padding: 16px;
+  }
+
+  .user-profile-message, .error {
+    font-size: 16px;
+    padding: 9px;
+    margin-top: 15px;
+  }
+
+  .input-field option {
+    background-color: #13221d;
+    color: #eee;
+    font-size: 10px;
+    padding: 5px;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .user-profile {
+    padding: 40px 80px;
+    min-height: 100vh;
+    padding-bottom: 13vh;
+  }
+
+  .profile-header {
+    padding: 20px;
+  }
+
+  .profile-picture {
+    width: 120px;
+    height: 120px;
+    margin-bottom: 14px;
+  }
+
+  .profile-name {
+    font-size: 24px;
+  }
+
+  .info-item {
+    flex-direction: row;
+    align-items: center;
+    padding: 18px;
+    margin: 14px 0;
+  }
+
+  .info-label {
+    margin-right: 18px;
+  }
+
+  .info-item .update-button {
+    margin-left: 69%;
+    font-size: 16px;
+  }
+
+  .input-field {
+    padding: 15px;
+    font-size: 16px;
+  }
+
+  .button-group {
+    flex-direction: row;
+  }
+
+  .save-button, .cancel-button, .edit-button, .update-button {
+    width: 48%;
+    padding: 15px;
+  }
+
+  .edit-button, .button {
+    padding: 17px;
+  }
+
+  .user-profile-message, .error {
+    font-size: 17px;
+    padding: 10px;
+    margin-top: 20px;
+  }
+
+  .input-field option {
+    background-color: #13221d;
+    color: #eee;
+    font-size: 11px;
+    padding: 5px;
+  }
+}
+
+@media (min-width: 1024px) and (max-width: 1366px) {
+  .user-profile {
+    padding: 40px 120px;
+    min-height: 100vh;
+    padding-bottom: 13vh;
+  }
+
+  .profile-header {
+    padding: 25px;
+  }
+
+  .profile-picture {
+    width: 130px;
+    height: 130px;
+    margin-bottom: 15px;
+  }
+
+  .profile-name {
+    font-size: 25px;
+  }
+
+  .info-item {
+    flex-direction: row;
+    align-items: center;
+    padding: 20px;
+    margin: 15px 0;
+  }
+
+  .info-label {
+    margin-right: 20px;
+  }
+
+  .info-item .update-button {
+    margin-left: 70%;
+    font-size: 17px;
+  }
+
+  .input-field {
+    padding: 16px;
+    font-size: 17px;
+  }
+
+  .button-group {
+    flex-direction: row;
+  }
+
+  .save-button, .cancel-button, .edit-button, .update-button {
+    width: 48%;
+    padding: 16px;
+  }
+
+  .edit-button, .button {
+    padding: 18px;
+  }
+
+  .user-profile-message, .error {
+    font-size: 18px;
+    padding: 11px;
+    margin-top: 25px;
+  }
+}
+
+@media (min-width: 1367px) and (max-width: 1600px) {
+  .user-profile {
+    padding: 40px 150px;
+    min-height: 100vh;
+    padding-bottom: 13vh;
+  }
+
+  .profile-header {
+    padding: 25px;
+  }
+
+  .profile-picture {
+    width: 140px;
+    height: 140px;
+    margin-bottom: 16px;
+  }
+
+  .profile-name {
+    font-size: 26px;
+  }
+
+  .info-item {
+    flex-direction: row;
+    align-items: center;
+    padding: 22px;
+    margin: 16px 0;
+  }
+
+  .info-label {
+    margin-right: 22px;
+  }
+
+  .info-item .update-button {
+    margin-left: 82%;
+    font-size: 18px;
+  }
+
+  .input-field {
+    padding: 17px;
+    font-size: 18px;
+  }
+
+  .button-group {
+    flex-direction: row;
+  }
+
+  .save-button, .cancel-button, .edit-button, .update-button {
+    width: 48%;
+    padding: 17px;
+  }
+
+  .edit-button, .button {
+    padding: 19px;
+  }
+
+  .user-profile-message, .error {
+    font-size: 19px;
+    padding: 12px;
+    margin-top: 30px;
+  }
+}
+
+@media (min-width: 1601px) {
+  .user-profile {
+    padding: 50px 200px;
+    min-height: 100vh;
+    padding-bottom: 13vh;
+  }
+
+  .profile-header {
+    padding: 30px;
+  }
+
+  .profile-picture {
+    width: 150px;
+    height: 150px;
+    margin-bottom: 18px;
+  }
+
+  .profile-name {
+    font-size: 28px;
+  }
+
+  .info-item {
+    flex-direction: row;
+    align-items: center;
+    padding: 24px;
+    margin: 18px 0;
+  }
+
+  .info-label {
+    margin-right: 24px;
+  }
+
+  .info-item .update-button {
+    margin-left: 85%;
+    font-size: 19px;
+  }
+
+  .input-field {
+    padding: 18px;
+    font-size: 19px;
+  }
+
+  .button-group {
+    flex-direction: row;
+  }
+
+  .save-button, .cancel-button, .edit-button, .update-button {
+    width: 48%;
+    padding: 18px;
+  }
+
+  .edit-button, .button {
+    padding: 20px;
+  }
+
+  .user-profile-message, .error {
+    font-size: 20px;
+    padding: 13px;
+    margin-top: 35px;
+  }
 }

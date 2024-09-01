@@ -135,3 +135,17 @@
   margin-top: 10px;
   color: #f44336;
 }
+
+@media screen and (max-width:600px) {
+  .respond-friend-request {
+    padding: 27px 20px;
+    padding-bottom: 8vh;
+   }
+   .requester-full-name {
+    font-size: 16px;
+  }
+  .requester-profile-picture {
+    width: 48px;
+    height: 48px;
+  }
+}
