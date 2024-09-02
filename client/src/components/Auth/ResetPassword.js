@@ -27,14 +27,14 @@ const ResetPassword = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="reset-password-form">
+    <form onSubmit={handleSubmit} className="reset-password-form forgot-password-form">
       <h2>Reset Password</h2>
       <input
         type="password"
         placeholder="New password"
         value={newPassword}
         onChange={(e) => setNewPassword(e.target.value)}
-        className="reset-password-input"
+        className="reset-password-input input-field"
         required
       />
       <input
@@ -42,13 +42,13 @@ const ResetPassword = () => {
         placeholder="Confirm new password"
         value={confirmPassword}
         onChange={(e) => setConfirmPassword(e.target.value)}
-        className="reset-password-input"
+        className="reset-password-input input-field"
         required
       />
-      <button type="submit" disabled={loading} className="reset-password-button">
+      <button type="submit" disabled={loading} className="reset-password-button button">
         {loading ? 'Resetting...' : 'Reset Password'}
       </button>
-      {message && <p className="reset-password-message">{message}</p>}
+      {message && <p className="forgot-password-message error-message">{message}</p>}
     </form>
   );
 };

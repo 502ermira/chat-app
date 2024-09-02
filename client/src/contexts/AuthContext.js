@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import API from '../api';
+import Loader from '../components/Loader/Loader';
 
 const AuthContext = createContext();
 
@@ -52,7 +53,9 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider value={{ user, token, login, logout }}>
-      {!loading ? children : <div>Loading...</div>}
+      {!loading ? children : 
+        <p className='loader'></p>
+      }
     </AuthContext.Provider>
   );
 };

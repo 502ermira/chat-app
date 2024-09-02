@@ -14,8 +14,9 @@ import { FriendRequestProvider } from './contexts/FriendRequestContext';
 import { UnseenMessagesProvider } from './contexts/UnseenMessagesContext';
 import { NotificationProvider } from './contexts/NotificationContext';
 import Notification from './components/Notification/Notification';
-import ForgotPassword from './components/Auth/ForgotPassword.js';
+import ForgotPassword from './components/Auth/ForgotPassword/ForgotPassword.js';
 import ResetPassword from './components/Auth/ResetPassword.js';
+import LandingPage from './pages/LandingPage/LandingPage.js';
 import './App.css';
 
 const AppRoutes = () => {
@@ -23,6 +24,9 @@ const AppRoutes = () => {
   const isChatPage = useMatch('/chat/:friendId');
   const isLoginForm = useMatch('/login');
   const isSignupForm = useMatch('/signup');
+  const isLandingPage =useMatch('/home');
+  const isForgotPasswordPage =useMatch('/forgot-password');
+  const isResetPasswordPage =useMatch('/reset-password/*');
   const location = useLocation();
 
   const hideNotifications = location.pathname === '/recent-chats';
@@ -30,9 +34,10 @@ const AppRoutes = () => {
   return (
     <>
       <Routes>
+        <Route path="/home" element={!user ? <LandingPage /> : <Navigate to="/" />} />
         <Route path="/login" element={!user ? <LoginPage /> : <Navigate to="/" />} />
         <Route path="/signup" element={!user ? <SignupPage /> : <Navigate to="/" />} />
-        <Route path="/" element={user ? <HomePage /> : <Navigate to="/login" />} />
+        <Route path="/" element={user ? <HomePage /> : <Navigate to="/home" />} />
         <Route path="/chat/:friendId" element={user ? <ChatPage /> : <Navigate to="/login" />} />
         <Route path="/friends" element={user ? <FriendsPage /> : <Navigate to="/login" />} />
         <Route path="/requests" element={user ? <RequestsPage /> : <Navigate to="/login" />} />
@@ -41,7 +46,7 @@ const AppRoutes = () => {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
       </Routes>
-      {!isChatPage && !isLoginForm && !isSignupForm && <BottomNav />}
+      {!isChatPage && !isLoginForm && !isSignupForm && !isLandingPage && !isForgotPasswordPage && !isResetPasswordPage && <BottomNav />}
       <Notification hideNotifications={hideNotifications} />
     </>
   );

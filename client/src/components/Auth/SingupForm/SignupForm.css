@@ -17,7 +17,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.7);
     z-index: 1;
   }
   
@@ -31,7 +31,7 @@
   .signup-title {
     font-size: 7.4rem;
     margin-bottom: 20px;
-    margin-top: 35px;
+    margin-top: 10px;
     font-family: "Anta", sans-serif;
     font-weight: 400;
     font-style: normal;
@@ -116,7 +116,7 @@
   }
   
   .signup-input-select option {
-    background-color: #2b2b2b;
+    background-color: #233b2c;
     color: #e0e0e0;
     font-size: 1rem;
   }
@@ -181,3 +181,25 @@
     opacity: 1;
   }
   
+  @media screen and (max-width:500px){
+    .signup-input {
+      padding: 15px 12px;
+      font-size: 0.9rem;
+    }
+    .signup-input-select {
+      padding: 15px 12px;
+      border-radius: 5px;
+      min-width: 49%;
+      font-size: 0.9rem;
+    }
+    .signup-input-select option {
+      font-size: 0.8rem;
+    }
+    .signup-input::file-selector-button {
+      padding: 5px;
+      margin-right: 7px;
+      font-size: 0.8rem;
+      margin-top: -10px;
+      margin-bottom: -10px;
+    }
+  }
